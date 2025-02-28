@@ -1,2 +1,2 @@
-# SWANG-Tech-Lab03
-this git repo is for our 3rd lab 
+# SWANG-Tech_Full_Project
+SWANG Tech's repository for the whole term project

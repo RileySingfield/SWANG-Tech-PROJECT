@@ -1,18 +1,16 @@
-package Interface;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
-
 class BeautyProductCatalogGUI {
     private BeautyProductCatalogImpl catalog;
     private JFrame frame;
     private DefaultListModel<String> listModel;
     private JList<String> productList;
 
-    public static void main(String[] args) {
+    public BeautyProductCatalogGUI() {
         catalog = new BeautyProductCatalogImpl();
         frame = new JFrame("Beauty Product Catalog");
         frame.setSize(400, 300);
@@ -38,16 +36,28 @@ class BeautyProductCatalogGUI {
         addButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String name = nameField.getText();
-                double price = Double.parseDouble(priceField.getText());
-                BeautyProduct product = new BeautyProduct(String.valueOf(System.currentTimeMillis()), name, price);
-                catalog.addProduct(product);
-                listModel.addElement(product.toString());
-                nameField.setText("");
-                priceField.setText("");
+                try {
+                    String name = nameField.getText().trim();
+                    double price = Double.parseDouble(priceField.getText().trim());
+                    if (name.isEmpty()) {
+                        JOptionPane.showMessageDialog(frame, "Product name cannot be empty!", "Input Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                    BeautyProduct product = new BeautyProduct(String.valueOf(System.currentTimeMillis()), name, price);
+                    catalog.addProduct(product);
+                    listModel.addElement(product.toString());
+                    nameField.setText("");
+                    priceField.setText("");
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(frame, "Please enter a valid price!", "Input Error", JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
 
         frame.setVisible(true);
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new BeautyProductCatalogGUI());
     }
 }

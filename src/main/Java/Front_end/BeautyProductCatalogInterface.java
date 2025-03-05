@@ -1,7 +1,5 @@
-package com.beauty.catalog.Frontend;
-
-import com.beauty.catalog.Backend.Product;
-import com.beauty.catalog.Backend.ProductManager;
+package Front_end;
+import Back_end.*;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -45,24 +43,45 @@ public class BeautyProductCatalogInterface {
         frame.setSize(1600, 800);
         frame.getContentPane().setBackground(new Color(245, 245, 245));
 
-        // Top panel with search, add, delete buttons
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         topPanel.setBackground(Color.WHITE);
         searchField = new JTextField(20);
         JButton searchButton = new JButton("Search");
-        JButton addButton = new JButton("Add");
         searchButton.setBackground(Color.WHITE);
         searchButton.setOpaque(true);
         searchButton.setBorderPainted(false);
+        JButton clearButton = new JButton("x");
+
+        clearButton.setBackground(Color.WHITE);
+        clearButton.setOpaque(true);
+        clearButton.setBorderPainted(false);
+        clearButton.setContentAreaFilled(false);
+        clearButton.setFont(new Font("Arial", Font.BOLD, 12));
+        clearButton.setPreferredSize(new Dimension(40, 25));
+        clearButton.addActionListener(e -> searchField.setText(""));
+
+        JButton removeSearchButton = new JButton("Remove Search");
+        removeSearchButton.setBackground(Color.LIGHT_GRAY);
+        removeSearchButton.setOpaque(true);
+        removeSearchButton.setBorderPainted(false);
+        removeSearchButton.setVisible(false);
+
+        JPanel searchPanel = new JPanel();
+        searchPanel.setBackground(Color.WHITE);
+        searchPanel.setLayout(new BoxLayout(searchPanel, BoxLayout.X_AXIS));
+        searchPanel.add(searchField);
+        searchPanel.add(clearButton);
+        searchPanel.add(removeSearchButton);
+
+        JButton addButton = new JButton("Add");
         addButton.setBackground(Color.WHITE);
         addButton.setOpaque(true);
         addButton.setBorderPainted(false);
 
-        topPanel.add(searchField);
+        topPanel.add(searchPanel);
         topPanel.add(searchButton);
         topPanel.add(addButton);
 
-        // Catalog panel with white background
         catalogPanel = new JPanel();
         catalogPanel.setBackground(Color.WHITE);
         catalogPanel.setLayout(new GridLayout(0, 3, 10, 10));
@@ -71,7 +90,6 @@ public class BeautyProductCatalogInterface {
         catalogScrollPane.setBorder(null);
         catalogScrollPane.getViewport().setBackground(Color.WHITE);
 
-        // Detail panel with soft background and padding, and make it scrollable.
         detailPanel = new JPanel(new BorderLayout());
         detailPanel.setBackground(Color.WHITE);
         detailPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -79,7 +97,6 @@ public class BeautyProductCatalogInterface {
         detailScrollPane.setBorder(null);
         detailScrollPane.getViewport().setBackground(new Color(250, 250, 250));
 
-        // Use a split pane for catalog and details.
         mainSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, catalogScrollPane, detailScrollPane);
         mainSplitPane.setDividerSize(5);
         mainSplitPane.setDividerLocation(frame.getWidth());
@@ -89,8 +106,19 @@ public class BeautyProductCatalogInterface {
         frame.add(mainSplitPane, BorderLayout.CENTER);
         frame.setVisible(true);
 
-        // Button actions
-        searchButton.addActionListener(e -> performSearch());
+        searchButton.addActionListener(e -> {
+            String query = searchField.getText().trim();
+            if (!query.isEmpty()) {
+                performSearch();
+                searchField.setText("");
+                removeSearchButton.setVisible(true); // this was hidden before
+            }
+        });
+        removeSearchButton.addActionListener(e -> {
+            searchField.setText("");
+            removeSearchButton.setVisible(false);
+            loadProducts(productManager.getAllProducts());
+        });
         addButton.addActionListener(e -> showAddProductDialog());
     }
 
@@ -101,7 +129,6 @@ public class BeautyProductCatalogInterface {
             productCard.setBackground(Color.WHITE);
             productCard.setBorder(BorderFactory.createLineBorder(Color.WHITE));
 
-            // Product image label
             JLabel imageLabel = new JLabel();
             ImageIcon productImage;
             try {
@@ -128,7 +155,7 @@ public class BeautyProductCatalogInterface {
                 }
             });
 
-            // Details button with soft pink color and narrow size.
+
             JButton detailsButton = new JButton(product.getName());
             detailsButton.setPreferredSize(new Dimension(100, 30));
             detailsButton.setBackground(new Color(255, 255, 255));
@@ -153,30 +180,30 @@ public class BeautyProductCatalogInterface {
     }
 
     public static ImageIcon fetchProductImage(String webpUrlString) throws IOException {
-        // Open the WebP image from the URL
+        // Open the WebP image from URL
         URL webpUrl = new URL(webpUrlString);
         BufferedImage webpImage = ImageIO.read(webpUrl);
         if (webpImage == null) {
             throw new IOException("Could not read the WebP image. Ensure a WebP reader is installed.");
         }
 
-        // Get a JPEG writer
+        // initiate JPEG writer
         Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName("jpg");
         if (!writers.hasNext()) {
             throw new IllegalStateException("No JPEG writers available");
         }
         ImageWriter writer = writers.next();
 
-        // Write the JPEG to a ByteArrayOutputStream
+        // JPEG to a ByteArrayOutputStream
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ImageOutputStream ios = ImageIO.createImageOutputStream(baos);
         writer.setOutput(ios);
 
-        // Set the compression quality to maximum
+        // Compression quality to maximum
         ImageWriteParam param = writer.getDefaultWriteParam();
         if (param.canWriteCompressed()) {
             param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-            param.setCompressionQuality(1.0f); // Maximum quality
+            param.setCompressionQuality(1.0f);
         }
 
         // Convert the WebP image to JPEG in memory
@@ -197,7 +224,6 @@ public class BeautyProductCatalogInterface {
         detailPanel.removeAll();
         detailPanel.setLayout(new BorderLayout());
 
-        // Header panel with product name and a small close ("X") button in the top right.
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setOpaque(false);
         headerPanel.setBorder(new EmptyBorder(0, 0, 10, 0));
@@ -241,16 +267,22 @@ public class BeautyProductCatalogInterface {
         descriptionArea.setWrapStyleWord(true);
         descriptionArea.setLineWrap(true);
         descriptionArea.setEditable(false);
+        descriptionArea.setBorder(javax.swing.BorderFactory.createEmptyBorder());
         descriptionArea.setOpaque(false);
-        descriptionArea.setMaximumSize(new Dimension(350, 100));
+        descriptionArea.setMaximumSize(new Dimension(250, 600));
         descriptionArea.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JScrollPane scrollPane = new JScrollPane(descriptionArea);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setBorder(javax.swing.BorderFactory.createEmptyBorder());
 
         JLabel ratingLabel = new JLabel("Rating: " + product.getRating());
         ratingLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         contentPanel.add(imageLabel);
         contentPanel.add(Box.createVerticalStrut(10));
-        contentPanel.add(descriptionArea);
+        contentPanel.add(scrollPane);
         contentPanel.add(Box.createVerticalStrut(10));
         contentPanel.add(ratingLabel);
         detailPanel.add(contentPanel, BorderLayout.CENTER);
@@ -280,21 +312,30 @@ public class BeautyProductCatalogInterface {
     }
 
     private void showAddProductDialog() {
+        JTextField URLField = new JTextField();
         JTextField brandField = new JTextField();
         JTextField nameField = new JTextField();
         JTextField priceField = new JTextField();
         JTextField categoryField = new JTextField();
+        JTextField descriptionField = new JTextField();
+        JTextField typeField = new JTextField();
         JTextField ratingField = new JTextField();
 
-        JPanel panel = new JPanel(new GridLayout(5, 2, 5, 5));
+        JPanel panel = new JPanel(new GridLayout(8, 2, 5, 5));
         panel.add(new JLabel("Brand:"));
         panel.add(brandField);
         panel.add(new JLabel("Name:"));
         panel.add(nameField);
         panel.add(new JLabel("Price:"));
         panel.add(priceField);
+        panel.add(new JLabel("WEBP Image URL:"));
+        panel.add(URLField);
+        panel.add(new JLabel("Description:"));
+        panel.add(descriptionField);
         panel.add(new JLabel("Category:"));
         panel.add(categoryField);
+        panel.add(new JLabel("Product Type:"));
+        panel.add(typeField);
         panel.add(new JLabel("Rating:"));
         panel.add(ratingField);
 
@@ -304,8 +345,16 @@ public class BeautyProductCatalogInterface {
             try {
                 double rating = Double.parseDouble(ratingField.getText().trim());
                 Product newProduct = new Product(newId, brandField.getText().trim(), nameField.getText().trim(),
-                        priceField.getText().trim(), "", "", categoryField.getText().trim(), "", rating);
+                        priceField.getText().trim(), URLField.getText().trim(), descriptionField.getText().trim(), categoryField.getText().trim(), typeField.getText().trim(), rating);
                 productManager.addProduct(newProduct);
+                URLField.setText("");
+                brandField.setText("");
+                nameField.setText("");
+                priceField.setText("");
+                descriptionField.setText("");
+                categoryField.setText("");
+                typeField.setText("");
+                ratingField.setText("");
                 loadProducts(productManager.getAllProducts());
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(frame, "Invalid rating value.", "Error", JOptionPane.ERROR_MESSAGE);

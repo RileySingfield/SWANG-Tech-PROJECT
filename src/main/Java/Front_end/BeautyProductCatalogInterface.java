@@ -61,7 +61,7 @@ public class BeautyProductCatalogInterface {
         clearButton.addActionListener(e -> searchField.setText(""));
 
         JButton removeSearchButton = new JButton("Remove Search");
-        removeSearchButton.setBackground(Color.LIGHT_GRAY);
+        removeSearchButton.setBackground(Color.WHITE);
         removeSearchButton.setOpaque(true);
         removeSearchButton.setBorderPainted(false);
         removeSearchButton.setVisible(false);
@@ -82,6 +82,92 @@ public class BeautyProductCatalogInterface {
         topPanel.add(searchButton);
         topPanel.add(addButton);
 
+        //FILTER
+        JPanel filterPanel = new JPanel();
+        filterPanel.setLayout(new BoxLayout(filterPanel, BoxLayout.Y_AXIS));
+        filterPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+        filterPanel.setBackground(Color.WHITE);
+
+        // Filters label
+        JLabel filterLabel = new JLabel("Filters");
+        filterLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        filterLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        filterPanel.add(filterLabel);
+        filterPanel.add(Box.createVerticalStrut(10)); // Add spacing after label
+
+        // Price filter
+        JLabel priceLabel = new JLabel("Price Range:");
+        JComboBox<String> priceDropdown = new JComboBox<>(new String[]{"All","$0-10", "$10-20", "$20-30", "$30-40", "$40+"});
+        priceDropdown.setPreferredSize(new Dimension(200, 25)); // Set a proper size for the dropdown
+        JPanel priceDropdownPanel = new JPanel();
+        priceDropdownPanel.setBackground(Color.WHITE);
+        priceDropdownPanel.setLayout(new BoxLayout(priceDropdownPanel, BoxLayout.X_AXIS));
+        priceDropdownPanel.add(priceLabel);
+        priceDropdownPanel.add(Box.createHorizontalStrut(10)); // Add spacing between label and dropdown
+        priceDropdownPanel.add(priceDropdown);
+        filterPanel.add(priceDropdownPanel);
+        filterPanel.add(Box.createVerticalStrut(10)); // Add spacing after price filter
+
+        // Rating filter
+        JLabel ratingLabel = new JLabel("Minimum Rating:");
+        JSlider sliderRating = new JSlider();
+        sliderRating.setMaximum(5);
+        sliderRating.setMinimum(0);
+        sliderRating.setPreferredSize(new Dimension(200, 50)); // Adjust slider size
+        sliderRating.setBackground(Color.WHITE);
+        sliderRating.setOpaque(true);
+        JPanel ratingPanel = new JPanel();
+        ratingPanel.setBackground(Color.WHITE);
+        ratingPanel.setLayout(new BoxLayout(ratingPanel, BoxLayout.X_AXIS));
+        ratingPanel.add(ratingLabel);
+        ratingPanel.add(Box.createHorizontalStrut(10)); // Add spacing
+        ratingPanel.add(sliderRating);
+        filterPanel.add(ratingPanel);
+        filterPanel.add(Box.createVerticalStrut(10)); // Add spacing after rating filter
+
+        // Category filter
+        JLabel categoryLabel = new JLabel("Category:");
+        JComboBox<String> categoryDropdown = new JComboBox<>(new String[]{"All", "lipstick", "liquid", "powder", "palette", "pencil", "cream", "mineral", "lip_stain"});
+        categoryDropdown.setPreferredSize(new Dimension(200, 25)); // Set preferred size
+        JButton applyCategoryFilter = new JButton("Apply");
+        JPanel categoryPanel = new JPanel();
+        categoryPanel.setBackground(Color.WHITE);
+        categoryPanel.setLayout(new BoxLayout(categoryPanel, BoxLayout.X_AXIS));
+        categoryPanel.add(categoryLabel);
+        categoryPanel.add(Box.createHorizontalStrut(10)); // Add spacing between label and dropdown
+        categoryPanel.add(categoryDropdown);
+        categoryPanel.add(Box.createHorizontalStrut(10)); // Add spacing between dropdown and button
+        categoryPanel.add(applyCategoryFilter);
+        filterPanel.add(categoryPanel);
+
+        applyCategoryFilter.addActionListener(e -> {
+
+            if(applyCategoryFilter.isEnabled()) {
+                double minPrice;
+                double maxPrice;
+                if(priceDropdown.getSelectedItem().equals("$0-10")) {
+                    minPrice = 0.0;
+                    maxPrice = 10.0;
+                }else if(priceDropdown.getSelectedItem().equals("$10-20")) {
+                    minPrice = 10.0;
+                    maxPrice = 20.0;
+                }else if(priceDropdown.getSelectedItem().equals("$20-30")) {
+                    minPrice = 20.0;
+                    maxPrice = 30.0;
+                }else if(priceDropdown.getSelectedItem().equals("$30-40")) {
+                    minPrice = 30.0;
+                    maxPrice = 40.0;
+                }else if(priceDropdown.getSelectedItem().equals("$40")) {
+                    minPrice = 40.0;
+                    maxPrice = 100.0;
+                }else{
+                    minPrice = 0.0;
+                    maxPrice = 100.0;
+                }
+                loadProducts(productManager.filterProducts(categoryDropdown.getSelectedItem().toString(),minPrice,maxPrice,sliderRating.getValue()));
+            }
+        });
+
         catalogPanel = new JPanel();
         catalogPanel.setBackground(Color.WHITE);
         catalogPanel.setLayout(new GridLayout(0, 3, 10, 10));
@@ -95,12 +181,14 @@ public class BeautyProductCatalogInterface {
         detailPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
         JScrollPane detailScrollPane = new JScrollPane(detailPanel);
         detailScrollPane.setBorder(null);
-        detailScrollPane.getViewport().setBackground(new Color(250, 250, 250));
+        detailScrollPane.getViewport().setBackground(Color.WHITE);
 
-        mainSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, catalogScrollPane, detailScrollPane);
+        JSplitPane filterSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,filterPanel,catalogScrollPane);
+        mainSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, filterSplitPane, detailScrollPane);
         mainSplitPane.setDividerSize(5);
         mainSplitPane.setDividerLocation(frame.getWidth());
         mainSplitPane.setEnabled(false);
+
 
         frame.add(topPanel, BorderLayout.NORTH);
         frame.add(mainSplitPane, BorderLayout.CENTER);
@@ -178,13 +266,23 @@ public class BeautyProductCatalogInterface {
         catalogPanel.revalidate();
         catalogPanel.repaint();
     }
+    public static boolean isURL(String url) {
+        try {
+            (new java.net.URL(url)).openStream().close();
+            return true;
+        } catch (Exception ex) { }
+        return false;
+    }
 
     public static ImageIcon fetchProductImage(String webpUrlString) throws IOException {
         // Open the WebP image from URL
+        if(!isURL(webpUrlString)){
+            webpUrlString="https://dummyimage.com/158x184/cccccc/000000&text=Not+Found";
+        }
         URL webpUrl = new URL(webpUrlString);
         BufferedImage webpImage = ImageIO.read(webpUrl);
         if (webpImage == null) {
-            throw new IOException("Could not read the WebP image. Ensure a WebP reader is installed.");
+            webpImage = ImageIO.read(new URL("https://dummyimage.com/158x184/cccccc/000000&text=Not+Found"));
         }
 
         // initiate JPEG writer
@@ -228,6 +326,8 @@ public class BeautyProductCatalogInterface {
         headerPanel.setOpaque(false);
         headerPanel.setBorder(new EmptyBorder(0, 0, 10, 0));
 
+        JLabel priceLabel = new JLabel("Price: " + product.getPrice());
+
         JLabel nameLabel = new JLabel(product.getName());
         nameLabel.setHorizontalAlignment(SwingConstants.CENTER);
         nameLabel.setFont(new Font("SansSerif", Font.BOLD, 16));
@@ -247,7 +347,7 @@ public class BeautyProductCatalogInterface {
         deleteButton.setBorderPainted(false);
         deleteButton.addActionListener(e -> performDeleteProduct());
 
-
+        headerPanel.add(priceLabel, BorderLayout.EAST);
         headerPanel.add(nameLabel, BorderLayout.CENTER);
         bottomPanel.add(closeButton, BorderLayout.EAST);
         bottomPanel.add(deleteButton, BorderLayout.WEST);

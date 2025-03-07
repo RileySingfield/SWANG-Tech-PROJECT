@@ -1,12 +1,11 @@
 package Back_end;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ProductManager {
     private List<Product> products;
@@ -70,14 +69,26 @@ public class ProductManager {
 
     // Update a product
     public boolean updateProduct(int id, Product updatedProduct) {
+        if (updatedProduct == null) {
+            throw new IllegalArgumentException("Updated product cannot be null.");
+        }
+
         for (int i = 0; i < products.size(); i++) {
-            if (products.get(i).getId() == id) {
-                products.set(i, updatedProduct);
-                saveToFile();
+            Product existingProduct = products.get(i);
+            if (existingProduct.getId() == id) {
+                // Update only the editable fields
+                existingProduct.setName(updatedProduct.getName());
+                existingProduct.setPrice(updatedProduct.getPrice());
+                existingProduct.setDescription(updatedProduct.getDescription());
+                existingProduct.setCategory(updatedProduct.getCategory());
+                existingProduct.setRating(updatedProduct.getRating());
+                existingProduct.setBrand(updatedProduct.getBrand());
+
+                saveToFile(); // Save changes to file
                 return true;
             }
         }
-        return false;
+        return false; // Product not found
     }
 
     // Delete a product
@@ -102,17 +113,21 @@ public class ProductManager {
     }
 
     // Filter products
-    public List<Product> filterProducts(String category, double minPrice, double maxPrice, double minRating) {
-        List<Product> filteredProducts = new ArrayList<>();
+    public List<Product> filterProducts(List<Product> products, String category, double minPrice, double maxPrice, double minRating) {
+        List<Product> filteredProducts = new ArrayList<>(); // Create a new list to store filtered products
+
         for (Product product : products) {
-            if (matchesCategory(product, category) &&
+            boolean categoryMatches = category.equals("All") || matchesCategory(product, category);
+            if (categoryMatches &&
                     matchesPrice(product, minPrice, maxPrice) &&
                     matchesRating(product, minRating)) {
-                filteredProducts.add(product);
+                filteredProducts.add(product); // Add matching products to the new list
             }
         }
-        return filteredProducts;
+
+        return filteredProducts; // Return the filtered list
     }
+
 
     // Helper function to check category match
     private boolean matchesCategory(Product product, String category) {
@@ -142,5 +157,14 @@ public class ProductManager {
         } catch (NumberFormatException e) {
             return false;
         }
+    }
+
+    public boolean productExists(String name, String brand) {
+        for (Product p : products) {
+            if (p.getName().equalsIgnoreCase(name) && p.getBrand().equalsIgnoreCase(brand)) {
+                return true; // Duplicate found
+            }
+        }
+        return false;
     }
 }

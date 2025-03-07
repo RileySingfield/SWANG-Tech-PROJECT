@@ -1,5 +1,9 @@
 package Back_end;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
+
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -21,7 +25,8 @@ public class Product {
 
     private Double rating;
 
-    public Product(int id, String brand, String name, String price, String imageLink,String description, String category, String productType, Double rating) {
+    public Product(int id, String brand, String name, String price, String imageLink,
+                   String description, String category, String productType, Double rating) {
         this.id = id;
         this.brand = brand;
         this.name = name;
@@ -79,3 +84,5 @@ public class Product {
                 '}';
     }
 }
+
+

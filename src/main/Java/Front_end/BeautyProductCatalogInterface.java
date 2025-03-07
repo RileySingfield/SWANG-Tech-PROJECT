@@ -1,5 +1,6 @@
 package Front_end;
 import Back_end.*;
+import Back_end.Product;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -8,12 +9,14 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
 import java.util.List;
-import javax.imageio.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import javax.imageio.stream.ImageOutputStream;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.util.Iterator;
 import java.net.URL;
 
 public class BeautyProductCatalogInterface {
@@ -24,6 +27,13 @@ public class BeautyProductCatalogInterface {
     private ProductManager productManager;
     private Product selectedProduct = null; // currently selected product
     private JTextField searchField; // top panel search field
+    private Map<String, ImageIcon> imageCache = new HashMap<>(); // Cache for images
+    private ExecutorService imageLoaderExecutor = Executors.newFixedThreadPool(4);
+
+    // Filter components as instance variables
+    private JComboBox<String> priceDropdown;
+    private JSlider sliderRating;
+    private JComboBox<String> categoryDropdown;
 
     public BeautyProductCatalogInterface() {
         productManager = new ProductManager();
@@ -31,6 +41,9 @@ public class BeautyProductCatalogInterface {
     }
 
     private void initializeUI() {
+        // Enable hardware acceleration
+        System.setProperty("sun.java2d.opengl", "true");
+
         // Set Nimbus look and feel for a softer appearance.
         try {
             UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
@@ -82,7 +95,7 @@ public class BeautyProductCatalogInterface {
         topPanel.add(searchButton);
         topPanel.add(addButton);
 
-        //FILTER
+        // FILTER
         JPanel filterPanel = new JPanel();
         filterPanel.setLayout(new BoxLayout(filterPanel, BoxLayout.Y_AXIS));
         filterPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -97,75 +110,89 @@ public class BeautyProductCatalogInterface {
 
         // Price filter
         JLabel priceLabel = new JLabel("Price Range:");
-        JComboBox<String> priceDropdown = new JComboBox<>(new String[]{"All","$0-10", "$10-20", "$20-30", "$30-40", "$40+"});
-        priceDropdown.setPreferredSize(new Dimension(200, 25)); // Set a proper size for the dropdown
+        priceDropdown = new JComboBox<>(new String[]{"All", "$0-10", "$10-20", "$20-30", "$30-40", "$40+"});
+        priceDropdown.setPreferredSize(new Dimension(200, 25));
         JPanel priceDropdownPanel = new JPanel();
         priceDropdownPanel.setBackground(Color.WHITE);
         priceDropdownPanel.setLayout(new BoxLayout(priceDropdownPanel, BoxLayout.X_AXIS));
         priceDropdownPanel.add(priceLabel);
-        priceDropdownPanel.add(Box.createHorizontalStrut(10)); // Add spacing between label and dropdown
+        priceDropdownPanel.add(Box.createHorizontalStrut(10));
         priceDropdownPanel.add(priceDropdown);
         filterPanel.add(priceDropdownPanel);
-        filterPanel.add(Box.createVerticalStrut(10)); // Add spacing after price filter
+        filterPanel.add(Box.createVerticalStrut(10));
 
         // Rating filter
         JLabel ratingLabel = new JLabel("Minimum Rating:");
-        JSlider sliderRating = new JSlider();
+        sliderRating = new JSlider();
         sliderRating.setMaximum(5);
         sliderRating.setMinimum(0);
-        sliderRating.setPreferredSize(new Dimension(200, 50)); // Adjust slider size
+        sliderRating.setPreferredSize(new Dimension(200, 50));
         sliderRating.setBackground(Color.WHITE);
         sliderRating.setOpaque(true);
         JPanel ratingPanel = new JPanel();
         ratingPanel.setBackground(Color.WHITE);
         ratingPanel.setLayout(new BoxLayout(ratingPanel, BoxLayout.X_AXIS));
         ratingPanel.add(ratingLabel);
-        ratingPanel.add(Box.createHorizontalStrut(10)); // Add spacing
+        ratingPanel.add(Box.createHorizontalStrut(10));
         ratingPanel.add(sliderRating);
         filterPanel.add(ratingPanel);
-        filterPanel.add(Box.createVerticalStrut(10)); // Add spacing after rating filter
+        filterPanel.add(Box.createVerticalStrut(10));
 
         // Category filter
         JLabel categoryLabel = new JLabel("Category:");
-        JComboBox<String> categoryDropdown = new JComboBox<>(new String[]{"All", "lipstick", "liquid", "powder", "palette", "pencil", "cream", "mineral", "lip_stain"});
-        categoryDropdown.setPreferredSize(new Dimension(200, 25)); // Set preferred size
+        categoryDropdown = new JComboBox<>(new String[]{"All", "lipstick", "liquid", "powder", "palette", "pencil", "cream", "mineral", "lip_stain"});
+        categoryDropdown.setPreferredSize(new Dimension(200, 25));
         JButton applyCategoryFilter = new JButton("Apply");
         JPanel categoryPanel = new JPanel();
         categoryPanel.setBackground(Color.WHITE);
         categoryPanel.setLayout(new BoxLayout(categoryPanel, BoxLayout.X_AXIS));
         categoryPanel.add(categoryLabel);
-        categoryPanel.add(Box.createHorizontalStrut(10)); // Add spacing between label and dropdown
+        categoryPanel.add(Box.createHorizontalStrut(10));
         categoryPanel.add(categoryDropdown);
-        categoryPanel.add(Box.createHorizontalStrut(10)); // Add spacing between dropdown and button
+        categoryPanel.add(Box.createHorizontalStrut(10));
         categoryPanel.add(applyCategoryFilter);
         filterPanel.add(categoryPanel);
 
-        applyCategoryFilter.addActionListener(e -> {
+        // Clear Filters Button
+        JButton clearFiltersButton = new JButton("Clear Filters");
+        clearFiltersButton.setBackground(Color.WHITE);
+        clearFiltersButton.setOpaque(true);
+        clearFiltersButton.setBorderPainted(false);
+        clearFiltersButton.addActionListener(e -> {
+            // Reset filters to default values
+            priceDropdown.setSelectedIndex(0); // Reset price dropdown to "All"
+            sliderRating.setValue(0); // Reset rating slider to 0
+            categoryDropdown.setSelectedIndex(0); // Reset category dropdown to "All"
 
-            if(applyCategoryFilter.isEnabled()) {
-                double minPrice;
-                double maxPrice;
-                if(priceDropdown.getSelectedItem().equals("$0-10")) {
-                    minPrice = 0.0;
-                    maxPrice = 10.0;
-                }else if(priceDropdown.getSelectedItem().equals("$10-20")) {
-                    minPrice = 10.0;
-                    maxPrice = 20.0;
-                }else if(priceDropdown.getSelectedItem().equals("$20-30")) {
-                    minPrice = 20.0;
-                    maxPrice = 30.0;
-                }else if(priceDropdown.getSelectedItem().equals("$30-40")) {
-                    minPrice = 30.0;
-                    maxPrice = 40.0;
-                }else if(priceDropdown.getSelectedItem().equals("$40")) {
-                    minPrice = 40.0;
-                    maxPrice = 100.0;
-                }else{
-                    minPrice = 0.0;
-                    maxPrice = 100.0;
-                }
-                loadProducts(productManager.filterProducts(categoryDropdown.getSelectedItem().toString(),minPrice,maxPrice,sliderRating.getValue()));
+            // Reload all products
+            loadProducts(productManager.getAllProducts());
+        });
+
+        // Add the Clear Filters button to the filter panel
+        filterPanel.add(Box.createVerticalStrut(10));
+        filterPanel.add(clearFiltersButton);
+
+        // Apply Filters Button
+        applyCategoryFilter.addActionListener(e -> {
+            double minPrice = getMinPriceFromDropdown(priceDropdown.getSelectedItem().toString());
+            double maxPrice = getMaxPriceFromDropdown(priceDropdown.getSelectedItem().toString());
+            int minRating = sliderRating.getValue();
+            String selectedCategory = categoryDropdown.getSelectedItem().toString();
+
+            // Get search query
+            String query = searchField.getText().trim();
+
+            List<Product> results;
+            if (query.isEmpty()) {
+                // If no search query, apply only filters
+                results = productManager.filterProducts(productManager.getAllProducts(), selectedCategory, minPrice, maxPrice, minRating);
+            } else {
+                // If there's a search query, combine it with filters
+                results = productManager.searchProducts(query); // Get search results
+                results = productManager.filterProducts(results, selectedCategory, minPrice, maxPrice, minRating); // Apply filters to search results
             }
+
+            loadProducts(results); // Load the combined results
         });
 
         catalogPanel = new JPanel();
@@ -183,52 +210,54 @@ public class BeautyProductCatalogInterface {
         detailScrollPane.setBorder(null);
         detailScrollPane.getViewport().setBackground(Color.WHITE);
 
-        JSplitPane filterSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,filterPanel,catalogScrollPane);
+        JSplitPane filterSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, filterPanel, catalogScrollPane);
         mainSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, filterSplitPane, detailScrollPane);
         mainSplitPane.setDividerSize(5);
         mainSplitPane.setDividerLocation(frame.getWidth());
         mainSplitPane.setEnabled(false);
 
-
         frame.add(topPanel, BorderLayout.NORTH);
         frame.add(mainSplitPane, BorderLayout.CENTER);
         frame.setVisible(true);
 
+        searchPanel.add(removeSearchButton);
+        // Search Button Action Listener
         searchButton.addActionListener(e -> {
             String query = searchField.getText().trim();
             if (!query.isEmpty()) {
-                performSearch();
-                searchField.setText("");
-                removeSearchButton.setVisible(true); // this was hidden before
+                performSearch(); // Perform the search
+                removeSearchButton.setVisible(true); // Make the button visible
             }
         });
+
+
+        // Remove Search Button Action Listener
         removeSearchButton.addActionListener(e -> {
-            searchField.setText("");
-            removeSearchButton.setVisible(false);
-            loadProducts(productManager.getAllProducts());
+            searchField.setText(""); // Clear the search field
+            removeSearchButton.setVisible(false); // Hide the button
+
+            // Reload products with active filters (if any)
+            double minPrice = getMinPriceFromDropdown(priceDropdown.getSelectedItem().toString());
+            double maxPrice = getMaxPriceFromDropdown(priceDropdown.getSelectedItem().toString());
+            int minRating = sliderRating.getValue();
+            String selectedCategory = categoryDropdown.getSelectedItem().toString();
+
+            loadProducts(productManager.filterProducts(productManager.getAllProducts(), selectedCategory, minPrice, maxPrice, minRating));
         });
+
+        // Add Button Action Listener
         addButton.addActionListener(e -> showAddProductDialog());
     }
 
     private void loadProducts(List<Product> products) {
-        catalogPanel.removeAll();
+        catalogPanel.removeAll(); // Clear panel efficiently
+
         for (Product product : products) {
             JPanel productCard = new JPanel(new BorderLayout());
             productCard.setBackground(Color.WHITE);
             productCard.setBorder(BorderFactory.createLineBorder(Color.WHITE));
 
             JLabel imageLabel = new JLabel();
-            ImageIcon productImage;
-            try {
-                productImage = fetchProductImage(product.getImageLink());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            if (productImage != null) {
-                imageLabel.setIcon(productImage);
-            } else {
-                imageLabel.setText("No Image Available");
-            }
             imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
             imageLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             imageLabel.addMouseListener(new MouseAdapter() {
@@ -238,15 +267,24 @@ public class BeautyProductCatalogInterface {
                     try {
                         showProductDetails(product);
                     } catch (IOException ex) {
-                        throw new RuntimeException(ex);
+                        ex.printStackTrace();
                     }
                 }
             });
 
+            // Load image asynchronously
+            imageLoaderExecutor.submit(() -> {
+                try {
+                    ImageIcon productImage = fetchProductImage(product.getImageLink());
+                    SwingUtilities.invokeLater(() -> imageLabel.setIcon(productImage));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
 
             JButton detailsButton = new JButton(product.getName());
             detailsButton.setPreferredSize(new Dimension(100, 30));
-            detailsButton.setBackground(new Color(255, 255, 255));
+            detailsButton.setBackground(Color.WHITE);
             detailsButton.setOpaque(true);
             detailsButton.setBorderPainted(false);
             detailsButton.addActionListener(e -> {
@@ -254,68 +292,46 @@ public class BeautyProductCatalogInterface {
                 try {
                     showProductDetails(product);
                 } catch (IOException ex) {
-                    throw new RuntimeException(ex);
+                    ex.printStackTrace();
                 }
             });
 
             productCard.add(imageLabel, BorderLayout.CENTER);
             productCard.add(detailsButton, BorderLayout.SOUTH);
-
             catalogPanel.add(productCard);
         }
+
         catalogPanel.revalidate();
         catalogPanel.repaint();
     }
-    public static boolean isURL(String url) {
-        try {
-            (new java.net.URL(url)).openStream().close();
-            return true;
-        } catch (Exception ex) { }
-        return false;
+
+    public ImageIcon fetchProductImage(String imageUrl) throws IOException {
+        if (imageCache.containsKey(imageUrl)) {
+            return imageCache.get(imageUrl);
+        }
+
+        if (!isURL(imageUrl)) {
+            imageUrl = "https://dummyimage.com/158x184/cccccc/000000&text=Not+Found";
+        }
+
+        URL url = new URL(imageUrl);
+        BufferedImage image = ImageIO.read(url);
+        if (image == null) {
+            image = ImageIO.read(new URL("https://dummyimage.com/158x184/cccccc/000000&text=Not+Found"));
+        }
+
+        ImageIcon imageIcon = new ImageIcon(image);
+        imageCache.put(imageUrl, imageIcon); // Cache the image
+        return imageIcon;
     }
 
-    public static ImageIcon fetchProductImage(String webpUrlString) throws IOException {
-        // Open the WebP image from URL
-        if(!isURL(webpUrlString)){
-            webpUrlString="https://dummyimage.com/158x184/cccccc/000000&text=Not+Found";
+    private boolean isURL(String url) {
+        try {
+            new URL(url);
+            return true;
+        } catch (Exception ex) {
+            return false;
         }
-        URL webpUrl = new URL(webpUrlString);
-        BufferedImage webpImage = ImageIO.read(webpUrl);
-        if (webpImage == null) {
-            webpImage = ImageIO.read(new URL("https://dummyimage.com/158x184/cccccc/000000&text=Not+Found"));
-        }
-
-        // initiate JPEG writer
-        Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName("jpg");
-        if (!writers.hasNext()) {
-            throw new IllegalStateException("No JPEG writers available");
-        }
-        ImageWriter writer = writers.next();
-
-        // JPEG to a ByteArrayOutputStream
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ImageOutputStream ios = ImageIO.createImageOutputStream(baos);
-        writer.setOutput(ios);
-
-        // Compression quality to maximum
-        ImageWriteParam param = writer.getDefaultWriteParam();
-        if (param.canWriteCompressed()) {
-            param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-            param.setCompressionQuality(1.0f);
-        }
-
-        // Convert the WebP image to JPEG in memory
-        writer.write(null, new IIOImage(webpImage, null, null), param);
-        ios.close();
-        writer.dispose();
-
-        // Read the JPEG image back from the byte array
-        byte[] jpegData = baos.toByteArray();
-        ByteArrayInputStream bais = new ByteArrayInputStream(jpegData);
-        BufferedImage jpegImage = ImageIO.read(bais);
-
-        // Return as an ImageIcon
-        return new ImageIcon(jpegImage);
     }
 
     private void showProductDetails(Product product) throws IOException {
@@ -327,7 +343,6 @@ public class BeautyProductCatalogInterface {
         headerPanel.setBorder(new EmptyBorder(0, 0, 10, 0));
 
         JLabel priceLabel = new JLabel("Price: " + product.getPrice());
-
         JLabel nameLabel = new JLabel(product.getName());
         nameLabel.setHorizontalAlignment(SwingConstants.CENTER);
         nameLabel.setFont(new Font("SansSerif", Font.BOLD, 16));
@@ -341,16 +356,29 @@ public class BeautyProductCatalogInterface {
         closeButton.setOpaque(true);
         closeButton.setBorderPainted(false);
         closeButton.addActionListener(e -> closeDetailPanel());
+
         JButton deleteButton = new JButton("Delete");
         deleteButton.setBackground(Color.WHITE);
         deleteButton.setOpaque(true);
         deleteButton.setBorderPainted(false);
         deleteButton.addActionListener(e -> performDeleteProduct());
 
+        // Add Edit Button
+        JButton editButton = new JButton("Edit");
+        editButton.setBackground(Color.WHITE);
+        editButton.setOpaque(true);
+        editButton.setBorderPainted(false);
+        editButton.addActionListener(e -> showEditProductDialog(product));
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        buttonPanel.setOpaque(false);
+        buttonPanel.add(editButton);
+        buttonPanel.add(deleteButton);
+        buttonPanel.add(closeButton);
+
         headerPanel.add(priceLabel, BorderLayout.EAST);
         headerPanel.add(nameLabel, BorderLayout.CENTER);
-        bottomPanel.add(closeButton, BorderLayout.EAST);
-        bottomPanel.add(deleteButton, BorderLayout.WEST);
+        bottomPanel.add(buttonPanel, BorderLayout.EAST);
         detailPanel.add(headerPanel, BorderLayout.NORTH);
         detailPanel.add(bottomPanel, BorderLayout.SOUTH);
 
@@ -393,6 +421,106 @@ public class BeautyProductCatalogInterface {
         mainSplitPane.setDividerLocation((int) (frame.getWidth() * 0.66));
     }
 
+    private void showEditProductDialog(Product product) {
+        JTextField nameField = new JTextField(product.getName(), 20);
+        JTextField priceField = new JTextField(product.getPrice(), 20);
+        JTextField descriptionField = new JTextField(product.getDescription(), 20);
+        JTextField categoryField = new JTextField(product.getCategory(), 20);
+        JTextField ratingField = new JTextField(String.valueOf(product.getRating()), 20);
+        JTextField brandField = new JTextField(product.getBrand(), 20);
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+
+        panel.add(createLabelAndField("Name:", nameField));
+        panel.add(createLabelAndField("Price:", priceField));
+        panel.add(createLabelAndField("Description:", descriptionField));
+        panel.add(createLabelAndField("Category:", categoryField));
+        panel.add(createLabelAndField("Rating:", ratingField));
+        panel.add(createLabelAndField("Brand:", brandField));
+
+        while (true) {
+            int result = JOptionPane.showConfirmDialog(frame, panel, "Edit Product", JOptionPane.OK_CANCEL_OPTION);
+
+            if (result != JOptionPane.OK_OPTION) {
+                return; // Cancelled, exit the method
+            }
+
+            // Trimmed input values
+            String name = nameField.getText().trim();
+            String priceText = priceField.getText().trim();
+            String description = descriptionField.getText().trim();
+            String category = categoryField.getText().trim();
+            String ratingText = ratingField.getText().trim();
+            String brand = brandField.getText().trim();
+
+            // Validation checks
+            if (name.isEmpty() || priceText.isEmpty() || category.isEmpty() || brand.isEmpty()) {
+                JOptionPane.showMessageDialog(frame, "Name, Description, Category, and Brand cannot be empty.", "Validation Error", JOptionPane.ERROR_MESSAGE);
+                continue;
+            }
+
+            double price;
+            try {
+                price = Double.parseDouble(priceText);
+                if (price < 0) {
+                    throw new NumberFormatException();
+                }
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(frame, "Invalid price. Please enter a valid positive number.", "Validation Error", JOptionPane.ERROR_MESSAGE);
+                continue;
+            }
+
+            double rating;
+            try {
+                rating = Double.parseDouble(ratingText);
+                if (rating < 0 || rating > 5) {
+                    throw new NumberFormatException();
+                }
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(frame, "Invalid rating. Please enter a number between 0 and 5.", "Validation Error", JOptionPane.ERROR_MESSAGE);
+                continue;
+            }
+
+            try {
+                // Create a new Product object with validated fields
+                Product updatedProduct = new Product(
+                        product.getId(),
+                        brand,
+                        name,
+                        priceText, // Ensure correct data type in your Product constructor
+                        product.getImageLink(),
+                        description,
+                        category,
+                        product.getProductType(),
+                        rating
+                );
+
+                // Update the product in ProductManager
+                boolean success = productManager.updateProduct(product.getId(), updatedProduct);
+                if (success) {
+                    // Refresh UI
+                    showProductDetails(updatedProduct);
+                    loadProducts(productManager.getAllProducts());
+                    return; // Exit the method if successful
+                } else {
+                    JOptionPane.showMessageDialog(frame, "Failed to update product.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(frame, "An error occurred while updating the product.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+
+    private JPanel createLabelAndField(String labelText, JTextField textField) {
+        JPanel rowPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        rowPanel.add(new JLabel(labelText));
+        rowPanel.add(textField);
+        return rowPanel;
+    }
+
+
     private void closeDetailPanel() {
         detailPanel.removeAll();
         detailPanel.revalidate();
@@ -403,23 +531,78 @@ public class BeautyProductCatalogInterface {
     private void performSearch() {
         String query = searchField.getText().trim();
         List<Product> results;
+
+        // Get current filter values
+        double minPrice = getMinPriceFromDropdown(priceDropdown.getSelectedItem().toString());
+        double maxPrice = getMaxPriceFromDropdown(priceDropdown.getSelectedItem().toString());
+        int minRating = sliderRating.getValue();
+        String selectedCategory = categoryDropdown.getSelectedItem().toString();
+
         if (query.isEmpty()) {
-            results = productManager.getAllProducts();
+            // If no search query, apply only filters
+            results = productManager.filterProducts(productManager.getAllProducts(), selectedCategory, minPrice, maxPrice, minRating);
         } else {
-            results = productManager.searchProducts(query);
+            // If there's a search query, combine it with filters
+            results = productManager.searchProducts(query); // Get search results
+            results = productManager.filterProducts(results, selectedCategory, minPrice, maxPrice, minRating); // Apply filters to search results
         }
-        loadProducts(results);
+
+        loadProducts(results); // Load the combined results
     }
+
+    private double getMinPriceFromDropdown(String priceRange) {
+        switch (priceRange) {
+            case "$0-10":
+                return 0.0;
+            case "$10-20":
+                return 10.0;
+            case "$20-30":
+                return 20.0;
+            case "$30-40":
+                return 30.0;
+            case "$40+":
+                return 40.0;
+            default:
+                return 0.0; // "All"
+        }
+    }
+
+    private double getMaxPriceFromDropdown(String priceRange) {
+        switch (priceRange) {
+            case "$0-10":
+                return 10.0;
+            case "$10-20":
+                return 20.0;
+            case "$20-30":
+                return 30.0;
+            case "$30-40":
+                return 40.0;
+            case "$40+":
+                return 100.0; // Arbitrary large value
+            default:
+                return 100.0; // "All"
+        }
+    }
+
+
 
     private void showAddProductDialog() {
         JTextField URLField = new JTextField();
+        URLField.setTransferHandler(new TransferHandler("text"));
         JTextField brandField = new JTextField();
+        brandField.setTransferHandler(new TransferHandler("text"));
         JTextField nameField = new JTextField();
+        nameField.setTransferHandler(new TransferHandler("text"));
         JTextField priceField = new JTextField();
+        priceField.setTransferHandler(new TransferHandler("text"));
         JTextField categoryField = new JTextField();
+        categoryField.setTransferHandler(new TransferHandler("text"));
         JTextField descriptionField = new JTextField();
+        descriptionField.setTransferHandler(new TransferHandler("text"));
         JTextField typeField = new JTextField();
+        typeField.setTransferHandler(new TransferHandler("text"));
         JTextField ratingField = new JTextField();
+        ratingField.setTransferHandler(new TransferHandler("text"));
 
         JPanel panel = new JPanel(new GridLayout(8, 2, 5, 5));
         panel.add(new JLabel("Brand:"));
@@ -441,12 +624,57 @@ public class BeautyProductCatalogInterface {
 
         int result = JOptionPane.showConfirmDialog(frame, panel, "Add Product", JOptionPane.OK_CANCEL_OPTION);
         if (result == JOptionPane.OK_OPTION) {
-            int newId = productManager.getAllProducts().size() + 1;
             try {
+                // Validate required fields
+                if (nameField.getText().trim().isEmpty() ||brandField.getText().trim().isEmpty()|| priceField.getText().trim().isEmpty() || categoryField.getText().trim().isEmpty() || descriptionField.getText().trim().isEmpty() || typeField.getText().trim().isEmpty() || ratingField.getText().trim().isEmpty()) {
+                    JOptionPane.showMessageDialog(frame, "Name, Price, Brand, and Category are required fields.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+
+                // Parse numeric fields
+                double price = Double.parseDouble(priceField.getText().trim());
                 double rating = Double.parseDouble(ratingField.getText().trim());
-                Product newProduct = new Product(newId, brandField.getText().trim(), nameField.getText().trim(),
-                        priceField.getText().trim(), URLField.getText().trim(), descriptionField.getText().trim(), categoryField.getText().trim(), typeField.getText().trim(), rating);
+
+                if (price <= 0) {
+                    JOptionPane.showMessageDialog(frame, "Price must be a positive number.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                // Validate rating
+                if (rating < 0 || rating > 5) {
+                    JOptionPane.showMessageDialog(frame, "Rating must be between 0 and 5.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+
+                //check for duplicates
+                if (productManager.productExists(nameField.getText().trim(), brandField.getText().trim())) {
+                    JOptionPane.showMessageDialog(frame, "A product with this Name and Brand already exists.", "Duplicate Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+
+                // Generate a new ID
+                int newId = generateNewId();
+
+                // Create the new product
+                Product newProduct = new Product(
+                        newId,
+                        brandField.getText().trim(),
+                        nameField.getText().trim(),
+                        priceField.getText().trim(),
+                        URLField.getText().trim(),
+                        descriptionField.getText().trim(),
+                        categoryField.getText().trim(),
+                        typeField.getText().trim(),
+                        rating
+                );
+
+                // Add the product to the ProductManager
                 productManager.addProduct(newProduct);
+
+                // Clear the fields
                 URLField.setText("");
                 brandField.setText("");
                 nameField.setText("");
@@ -455,11 +683,27 @@ public class BeautyProductCatalogInterface {
                 categoryField.setText("");
                 typeField.setText("");
                 ratingField.setText("");
+
+                // Refresh the product list
                 loadProducts(productManager.getAllProducts());
+
+                // Show success message
+                JOptionPane.showMessageDialog(frame, "Product added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(frame, "Invalid rating value.", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(frame, "Invalid numeric value for Price or Rating.", "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
+    }
+
+    // Helper method to generate a new ID
+    private int generateNewId() {
+        int maxId = 0;
+        for (Product product : productManager.getAllProducts()) {
+            if (product.getId() > maxId) {
+                maxId = product.getId();
+            }
+        }
+        return maxId + 1;
     }
 
     private void performDeleteProduct() {
@@ -478,6 +722,8 @@ public class BeautyProductCatalogInterface {
                     "No Product Selected", JOptionPane.WARNING_MESSAGE);
         }
     }
+
+
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(BeautyProductCatalogInterface::new);

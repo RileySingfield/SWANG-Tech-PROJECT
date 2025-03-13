@@ -112,21 +112,22 @@ public class BeautyProductCatalogInterface {
         JLabel priceLabel = new JLabel("Price Range:");
         priceDropdown = new JComboBox<>(new String[]{"All", "$0-10", "$10-20", "$20-30", "$30-40", "$40+"});
         priceDropdown.setPreferredSize(new Dimension(200, 25));
+
         JPanel priceDropdownPanel = new JPanel();
         priceDropdownPanel.setBackground(Color.WHITE);
         priceDropdownPanel.setLayout(new BoxLayout(priceDropdownPanel, BoxLayout.X_AXIS));
         priceDropdownPanel.add(priceLabel);
-        priceDropdownPanel.add(Box.createHorizontalStrut(10));
+        priceDropdownPanel.add(Box.createHorizontalStrut(5));
         priceDropdownPanel.add(priceDropdown);
         filterPanel.add(priceDropdownPanel);
-        filterPanel.add(Box.createVerticalStrut(10));
+        filterPanel.add(Box.createVerticalStrut(5));
 
         // Rating filter
         JLabel ratingLabel = new JLabel("Minimum Rating:");
         sliderRating = new JSlider();
         sliderRating.setMaximum(5);
         sliderRating.setMinimum(0);
-        sliderRating.setPreferredSize(new Dimension(200, 50));
+        sliderRating.setPreferredSize(new Dimension(120, 25));
         sliderRating.setBackground(Color.WHITE);
         sliderRating.setOpaque(true);
         JPanel ratingPanel = new JPanel();
@@ -141,15 +142,15 @@ public class BeautyProductCatalogInterface {
         // Category filter
         JLabel categoryLabel = new JLabel("Category:");
         categoryDropdown = new JComboBox<>(new String[]{"All", "lipstick", "liquid", "powder", "palette", "pencil", "cream", "mineral", "lip_stain"});
-        categoryDropdown.setPreferredSize(new Dimension(200, 25));
+        categoryDropdown.setPreferredSize(new Dimension(120, 25));
         JButton applyCategoryFilter = new JButton("Apply");
         JPanel categoryPanel = new JPanel();
         categoryPanel.setBackground(Color.WHITE);
         categoryPanel.setLayout(new BoxLayout(categoryPanel, BoxLayout.X_AXIS));
         categoryPanel.add(categoryLabel);
-        categoryPanel.add(Box.createHorizontalStrut(10));
+        categoryPanel.add(Box.createHorizontalStrut(5));
         categoryPanel.add(categoryDropdown);
-        categoryPanel.add(Box.createHorizontalStrut(10));
+        categoryPanel.add(Box.createHorizontalStrut(5));
         categoryPanel.add(applyCategoryFilter);
         filterPanel.add(categoryPanel);
 
@@ -588,21 +589,15 @@ public class BeautyProductCatalogInterface {
 
     private void showAddProductDialog() {
         JTextField URLField = new JTextField();
-        URLField.setTransferHandler(new TransferHandler("text"));
         JTextField brandField = new JTextField();
-        brandField.setTransferHandler(new TransferHandler("text"));
         JTextField nameField = new JTextField();
-        nameField.setTransferHandler(new TransferHandler("text"));
         JTextField priceField = new JTextField();
-        priceField.setTransferHandler(new TransferHandler("text"));
-        JTextField categoryField = new JTextField();
-        categoryField.setTransferHandler(new TransferHandler("text"));
         JTextField descriptionField = new JTextField();
-        descriptionField.setTransferHandler(new TransferHandler("text"));
         JTextField typeField = new JTextField();
-        typeField.setTransferHandler(new TransferHandler("text"));
         JTextField ratingField = new JTextField();
-        ratingField.setTransferHandler(new TransferHandler("text"));
+
+        String[] categories = {"All", "lipstick", "liquid", "powder", "palette", "pencil", "cream", "mineral", "lip_stain"};
+        JComboBox<String> categoryField = new JComboBox<>(categories);
 
         JPanel panel = new JPanel(new GridLayout(8, 2, 5, 5));
         panel.add(new JLabel("Brand:"));
@@ -626,7 +621,7 @@ public class BeautyProductCatalogInterface {
         if (result == JOptionPane.OK_OPTION) {
             try {
                 // Validate required fields
-                if (nameField.getText().trim().isEmpty() ||brandField.getText().trim().isEmpty()|| priceField.getText().trim().isEmpty() || categoryField.getText().trim().isEmpty() || descriptionField.getText().trim().isEmpty() || typeField.getText().trim().isEmpty() || ratingField.getText().trim().isEmpty()) {
+                if (nameField.getText().trim().isEmpty() ||brandField.getText().trim().isEmpty()|| priceField.getText().trim().isEmpty() || (String) categoryField.getSelectedItem()== null || descriptionField.getText().trim().isEmpty() || typeField.getText().trim().isEmpty() || ratingField.getText().trim().isEmpty()) {
                     JOptionPane.showMessageDialog(frame, "Name, Price, Brand, and Category are required fields.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
@@ -666,7 +661,7 @@ public class BeautyProductCatalogInterface {
                         priceField.getText().trim(),
                         URLField.getText().trim(),
                         descriptionField.getText().trim(),
-                        categoryField.getText().trim(),
+                        (String)categoryField.getSelectedItem(),
                         typeField.getText().trim(),
                         rating
                 );
@@ -680,7 +675,7 @@ public class BeautyProductCatalogInterface {
                 nameField.setText("");
                 priceField.setText("");
                 descriptionField.setText("");
-                categoryField.setText("");
+                categoryField.setSelectedIndex(0);
                 typeField.setText("");
                 ratingField.setText("");
 

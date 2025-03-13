@@ -32,7 +32,7 @@
   "id" : 456,
   "brand" : "physicians formula",
   "name" : "Physicians Formula Nude Wear Glowing Nude Blush",
-  "price" : "15.99",
+  "price" : "20",
   "description" : "This natural, luxurious blush is so lightweight you'll never even feel it. Sheer coverage with a hint of luminosity delivers a lit-from-within blushing glow.Airy formula boosts skins natural luminosity, and allows skin’s natural radiance and color to shine through. A perfect blend of blush and complexion boosting tones brighten and enhance skin tone while adding a touch of naturally radiant color.Hypoallergenic. Fragrance-Free. Gluten Free. Paraben-Free. Non-Comedogenic. Dermatologist approved.",
   "category" : "powder",
   "rating" : 4.0,
@@ -57,16 +57,6 @@
   "category" : "powder",
   "rating" : 5.0,
   "image_link" : "https://d3t32hsnjxo7q6.cloudfront.net/i/dd6ee943412a416ecfe9e4a1b2bed107_ra,w158,h184_pa,w158,h184.jpg",
-  "product_type" : "blush"
-}, {
-  "id" : 451,
-  "brand" : "physicians formula",
-  "name" : "Physicians Formula Nude Wear Glowing Nude Blush ",
-  "price" : "15.99",
-  "description" : "This natural, luxurious blush is so lightweight you'll never even feel  it. Sheer coverage with a hint of luminosity delivers a lit-from-within  blushing glow.Airy formula boosts skins natural luminosity, and allows skin’s natural radiance and color to shine through. A  perfect blend of blush and complexion boosting tones brighten and  enhance skin tone while adding a touch of naturally radiant color.Hypoallergenic. Fragrance-Free. Gluten Free. Paraben-Free. Non-Comedogenic. Dermatologist approved.",
-  "category" : "powder",
-  "rating" : 4.0,
-  "image_link" : "https://d3t32hsnjxo7q6.cloudfront.net/i/f315b0da1a165666f67a8755c6f105ec_ra,w158,h184_pa,w158,h184.jpeg",
   "product_type" : "blush"
 }, {
   "id" : 449,
@@ -123,7 +113,7 @@
   "brand" : "covergirl",
   "name" : "CoverGirl Instant Cheekbones Contouring Blush",
   "price" : "7.99",
-  "description" : "Want great bone structure? Instant Cheekbones Contouring Blush lets you  create them instantly and easily. Each compact contains three expertly  coordinated shades that add natural-looking contour, so you can look  like you were born with great cheekbones, anytime!Features:​3 Complementary skin-flushed shades contour your cheekbonesLightweightDermatologically testedBlendable",
+  "description" : "Cheekbones blush",
   "category" : "powder",
   "rating" : 3.3,
   "image_link" : "https://d3t32hsnjxo7q6.cloudfront.net/i/5361038d5de79bedaca6c64b48271161_ra,w158,h184_pa,w158,h184.jpeg",
@@ -227,16 +217,6 @@
   "category" : "cream",
   "rating" : 2.0,
   "image_link" : "https://d3t32hsnjxo7q6.cloudfront.net/i/7e559a82a8c8b56d75ae5f108d8449ba_ra,w158,h184_pa,w158,h184.png",
-  "product_type" : "blush"
-}, {
-  "id" : 418,
-  "brand" : "marcelle",
-  "name" : "Marcelle Cream Blush",
-  "price" : "14.99",
-  "description" : "Marcelle’s Cream Blushes beautifully blend for  a flawless application. The richly pigmented shades provide a veil of  colour for a healthy glow.Compact includes a handy sponge applicator.",
-  "category" : "cream",
-  "rating" : 5.0,
-  "image_link" : "https://d3t32hsnjxo7q6.cloudfront.net/i/8d1dc771f1dbdf2fe5e3cb378c44f1fb_ra,w158,h184_pa,w158,h184.jpeg",
   "product_type" : "blush"
 }, {
   "id" : 417,

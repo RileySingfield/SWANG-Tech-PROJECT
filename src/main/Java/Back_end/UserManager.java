@@ -6,9 +6,10 @@ import java.util.Map;
 public class UserManager {
     private Map<String, ProductUser> users = new HashMap<>();
     private ProductUser loggedInUser = null;
-
+    //TODO add register method and add a method that checks if a username is taken already
     public UserManager() {
         users.put("admin", new ProductUser("adminAminah", "passwd1", "admin"));
+        users.put("admin", new ProductUser("gillian", "test", "admin"));
         users.put("generalUser", new ProductUser("generalUserAminah", "passwd2", "regular"));
     }
 

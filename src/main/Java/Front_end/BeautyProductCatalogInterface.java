@@ -757,7 +757,7 @@ public class BeautyProductCatalogInterface {
         c.gridwidth = 120;
         loginPanel.add(passwordField, c);
         JButton loginButton = new JButton("Login");
-        c.gridx=0;
+        c.gridx=1;
         c.gridy =3;
         loginPanel.add(loginButton, c);
 
@@ -773,6 +773,7 @@ public class BeautyProductCatalogInterface {
         warningWrong.setVisible(false);
         c.gridx=1;
         c.gridy =4;
+        loginPanel.add(warningEmpty, c);
         loginPanel.add(warningWrong, c);
 
         //TODO login button doesnt work quite yet, shows errors but something is wrong with something
@@ -783,6 +784,12 @@ public class BeautyProductCatalogInterface {
         c.gridy =5;
         loginPanel.add(override, c);
 
+        JButton registerButton = new JButton("Make an account");
+        c.gridx=1;
+        c.gridy =6;
+        loginPanel.add(registerButton, c);
+
+
         override.addActionListener(e -> {
             loginPanel.setVisible(false);
             catalogScreen();
@@ -791,14 +798,17 @@ public class BeautyProductCatalogInterface {
         loginButton.addActionListener(e -> {
             String username = usernameField.getText().trim();
             String password = passwordField.getText().trim();
-            if (username.isEmpty() || password.isEmpty()) {
+            System.out.println(username+" and "+password);
+            if (username.equals("") || password.equals("")) {
                 warningEmpty.setVisible(true);
+                warningWrong.setVisible(false);
             }else{
                 boolean success = userManager.login(username, password);
                 System.out.println(password);
                 System.out.println(success);
                 if(!success){
                     warningWrong.setVisible(true);
+                    warningEmpty.setVisible(false);
                 }else{
                     loginPanel.setVisible(false);
                     usernameField.setText("");
@@ -809,9 +819,122 @@ public class BeautyProductCatalogInterface {
                 }
             }
         });
+        registerButton.addActionListener(e -> {
+            loginPanel.setVisible(false);
+            registerScreen();
+        });
 
         loginPanel.setVisible(true);
         frame.add(loginPanel,BorderLayout.CENTER);
+        frame.setVisible(true);
+    }
+
+    public void registerScreen(){
+        UserManager userManager = new UserManager();
+        JPanel registerPanel = new JPanel();
+        registerPanel.setLayout(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.insets = new Insets(5,5,5,5);
+        registerPanel.setBackground(Color.WHITE);
+        JLabel loginLabel = new JLabel("Register");
+        c.gridx = 1;
+        c.gridy = 0;
+        registerPanel.add(loginLabel, c);
+        JLabel userLabel = new JLabel("Username: ");
+        c.gridx=0;
+        c.gridy =1;
+        registerPanel.add(userLabel, c);
+        JTextField usernameField = new JTextField(20);
+        usernameField.setMinimumSize(new Dimension(120, 25));
+        usernameField.setEditable(true);
+        c.gridx=1;
+        registerPanel.add(usernameField, c);
+        JLabel passwordLabel = new JLabel("Password: ");
+        c.gridx=0;
+        c.gridy =2;
+        registerPanel.add(passwordLabel, c);
+        JPasswordField passwordField = new JPasswordField(20);
+        passwordField.setEditable(true);
+        passwordField.setMinimumSize(new Dimension(120, 25));
+        c.gridx=1;
+        registerPanel.add(passwordField, c);
+        c.gridx=0;
+        c.gridy =3;
+        JPasswordField passwordField2 = new JPasswordField(20);
+        passwordField2.setEditable(true);
+        passwordField2.setMinimumSize(new Dimension(120, 25));
+        c.gridx=1;
+        registerPanel.add(passwordField2, c);
+        JButton registerButton = new JButton("Register");
+        c.gridx=1;
+        c.gridy =4;
+        registerPanel.add(registerButton, c);
+
+
+        //warning message
+        JLabel warningEmpty = new JLabel("Please enter a username and password.");
+        warningEmpty.setForeground(Color.RED);
+        warningEmpty.setVisible(false);
+        c.gridx=1;
+        c.gridy =5;
+        JLabel warningWrong = new JLabel("Passwords do not match.");
+        warningWrong.setForeground(Color.RED);
+        warningWrong.setVisible(false);
+
+        JLabel warningTaken = new JLabel("Username is already taken.");
+        warningTaken.setForeground(Color.RED);
+        warningTaken.setVisible(false);
+        registerPanel.add(warningWrong, c);
+        registerPanel.add(warningTaken, c);
+        registerPanel.add(warningEmpty, c);
+
+        //TEMP
+        JButton override = new JButton("Override");
+        c.gridx=1;
+        c.gridy =6;
+        registerPanel.add(override, c);
+
+        JButton loginButton = new JButton("Login");
+        c.gridx=1;
+        c.gridy =7;
+        registerPanel.add(loginButton, c);
+
+        override.addActionListener(e -> {
+            registerPanel.setVisible(false);
+            catalogScreen();
+        });
+
+        registerButton.addActionListener(e -> {
+            String username = usernameField.getText().trim();
+            String password = passwordField.getText().trim();
+            String password2 = passwordField2.getText().trim();
+            if (username.isEmpty() || password.isEmpty()||password2.isEmpty()) {
+                warningEmpty.setVisible(true);
+                warningWrong.setVisible(false);
+                warningTaken.setVisible(false);
+            }else if(!password.equals(password2)){
+                warningWrong.setVisible(true);
+                warningTaken.setVisible(false);
+                warningEmpty.setVisible(false);
+            }else if(false) {
+                //if username is taken
+                //TODO
+                warningWrong.setVisible(false);
+                warningTaken.setVisible(true);
+                warningEmpty.setVisible(false);
+            }else{
+                userManager.login(username,password);
+                registerPanel.setVisible(false);
+                catalogScreen();
+            }
+        });
+
+        loginButton.addActionListener(e -> {
+            registerPanel.setVisible(false);
+            loginScreen();
+        });
+        registerPanel.setVisible(true);
+        frame.add(registerPanel,BorderLayout.CENTER);
         frame.setVisible(true);
     }
 

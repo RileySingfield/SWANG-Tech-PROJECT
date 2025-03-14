@@ -1868,4 +1868,14 @@
   "rating" : 4.3,
   "image_link" : "https://d3t32hsnjxo7q6.cloudfront.net/i/b66c56aeb8d078123cca4c9c64d17cb9_ra,w158,h184_pa,w158,h184.jpeg",
   "product_type" : "lipstick"
+}, {
+  "id" : 461,
+  "brand" : "KVD Vegan Beauty",
+  "name" : "KVD Eyeliner in ULTRA-BLACK",
+  "price" : "4.0",
+  "description" : "Ultra-black vegan liquid eyeliner pen",
+  "category" : "pencil",
+  "rating" : 5.0,
+  "image_link" : "n/a",
+  "product_type" : "makeup"
 } ]

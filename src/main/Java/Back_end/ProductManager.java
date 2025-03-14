@@ -62,11 +62,17 @@ public class ProductManager {
     }
 
     // Add a new product
-    public void addProduct(Product product) {
+    public boolean addProduct(Product product) {
+        if (product == null) {
+            return false; // Prevent null products
+        }
+        if (products == null) {
+            products = new ArrayList<>(); // Ensure list is initialized
+        }
         products.add(product);
         saveToFile();
+        return true;
     }
-
     // Update a product
     public boolean updateProduct(int id, Product updatedProduct) {
         if (updatedProduct == null) {
@@ -84,15 +90,18 @@ public class ProductManager {
                 existingProduct.setRating(updatedProduct.getRating());
                 existingProduct.setBrand(updatedProduct.getBrand());
 
-                saveToFile(); // Save changes to file
+                saveToFile();
                 return true;
             }
         }
-        return false; // Product not found
+        return false;
     }
 
     // Delete a product
     public boolean deleteProduct(int id) {
+        boolean exists = products.stream().anyMatch(p -> p.getId() == id);
+        if (!exists) return false;
+
         boolean removed = products.removeIf(product -> product.getId() == id);
         if (removed) saveToFile();
         return removed;

@@ -6,16 +6,17 @@ import java.util.Map;
 public class UserManager {
     private Map<String, ProductUser> users = new HashMap<>();
     private ProductUser loggedInUser = null;
-    //TODO add register method and add a method that checks if a username is taken already
+    //TODO add register method
+    //TODO add a method that checks if a username is taken already
     public UserManager() {
-        users.put("admin", new ProductUser("adminAminah", "passwd1", "admin"));
-        users.put("admin", new ProductUser("gillian", "test", "admin"));
-        users.put("generalUser", new ProductUser("generalUserAminah", "passwd2", "regular"));
+        users.put("adminAminah", new ProductUser("adminAminah", "passwd1", "admin"));
+        users.put("gillian", new ProductUser("gillian", "test", "admin"));
+        users.put("generalUserAminah", new ProductUser("generalUserAminah", "passwd2", "regular"));
     }
 
     public boolean login(String username, String password) {
         ProductUser user = users.get(username);
-        if (user != null && user.getPassword().equals(password)) {
+        if (user != null && (user.getPassword()).equals(password)) {
             loggedInUser = user;
             return true;
         }

@@ -13,10 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import javax.imageio.stream.ImageOutputStream;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.net.URL;
 
 public class BeautyProductCatalogInterface {
@@ -29,6 +26,7 @@ public class BeautyProductCatalogInterface {
     private JTextField searchField; // top panel search field
     private Map<String, ImageIcon> imageCache = new HashMap<>(); // Cache for images
     private ExecutorService imageLoaderExecutor = Executors.newFixedThreadPool(4);
+    private UserManager userManager = new UserManager();
 
     // Filter components as instance variables
     private JComboBox<String> priceDropdown;
@@ -324,14 +322,12 @@ public class BeautyProductCatalogInterface {
         }
     }
 
-
     private JPanel createLabelAndField(String labelText, JTextField textField) {
         JPanel rowPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         rowPanel.add(new JLabel(labelText));
         rowPanel.add(textField);
         return rowPanel;
     }
-
 
     private void closeDetailPanel() {
         detailPanel.removeAll();
@@ -395,8 +391,6 @@ public class BeautyProductCatalogInterface {
                 return 100.0; // "All"
         }
     }
-
-
 
     private void showAddProductDialog() {
         JTextField URLField = new JTextField();
@@ -567,9 +561,16 @@ public class BeautyProductCatalogInterface {
         addButton.setOpaque(true);
         addButton.setBorderPainted(false);
 
+        //show username and status
+        //TODO add a dropdown menu to sign out or change accounts
+        JLabel usernameLabel = new JLabel(userManager.getLoggedInUser().getUsername());
+
+
         topPanel.add(searchPanel);
         topPanel.add(searchButton);
         topPanel.add(addButton);
+        //TODO move this right
+        topPanel.add(usernameLabel);
 
         // FILTER
         JPanel filterPanel = new JPanel();
@@ -727,7 +728,7 @@ public class BeautyProductCatalogInterface {
     }
 
     public void loginScreen(){
-        UserManager userManager = new UserManager();
+        //TODO add option to use as guest
         JPanel loginPanel = new JPanel();
         loginPanel.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
@@ -797,15 +798,14 @@ public class BeautyProductCatalogInterface {
 
         loginButton.addActionListener(e -> {
             String username = usernameField.getText().trim();
-            String password = passwordField.getText().trim();
-            System.out.println(username+" and "+password);
+            char[] passwordChar = passwordField.getPassword();
+            String password = new String(passwordChar);
+            System.out.println(password);
             if (username.equals("") || password.equals("")) {
                 warningEmpty.setVisible(true);
                 warningWrong.setVisible(false);
             }else{
                 boolean success = userManager.login(username, password);
-                System.out.println(password);
-                System.out.println(success);
                 if(!success){
                     warningWrong.setVisible(true);
                     warningEmpty.setVisible(false);
@@ -830,7 +830,6 @@ public class BeautyProductCatalogInterface {
     }
 
     public void registerScreen(){
-        UserManager userManager = new UserManager();
         JPanel registerPanel = new JPanel();
         registerPanel.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();

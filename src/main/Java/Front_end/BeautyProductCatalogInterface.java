@@ -21,12 +21,13 @@ public class BeautyProductCatalogInterface {
     private JPanel catalogPanel;
     private JPanel detailPanel;
     private JSplitPane mainSplitPane;
-    private ProductManager productManager;
+    private final ProductManager productManager;
     private Product selectedProduct = null; // currently selected product
     private JTextField searchField; // top panel search field
-    private Map<String, ImageIcon> imageCache = new HashMap<>(); // Cache for images
-    private ExecutorService imageLoaderExecutor = Executors.newFixedThreadPool(4);
-    private UserManager userManager = new UserManager();
+    private final Map<String, ImageIcon> imageCache = new HashMap<>(); // Cache for images
+    private final ExecutorService imageLoaderExecutor = Executors.newFixedThreadPool(4);
+    private final UserManager userManager = new UserManager();
+    private final String[] categories = {"All", "lipstick", "liquid", "powder", "palette", "pencil", "cream", "mineral", "lip_stain"};
 
     // Filter components as instance variables
     private JComboBox<String> priceDropdown;
@@ -58,6 +59,7 @@ public class BeautyProductCatalogInterface {
         //catalogScreen();
 
     }
+
     private void loadProducts(List<Product> products) {
         catalogPanel.removeAll(); // Clear panel efficiently
 
@@ -234,7 +236,7 @@ public class BeautyProductCatalogInterface {
         JTextField nameField = new JTextField(product.getName(), 20);
         JTextField priceField = new JTextField(product.getPrice(), 20);
         JTextField descriptionField = new JTextField(product.getDescription(), 20);
-        JTextField categoryField = new JTextField(product.getCategory(), 20);
+        JComboBox categoryBox = new JComboBox<>(categories);
         JTextField ratingField = new JTextField(String.valueOf(product.getRating()), 20);
         JTextField brandField = new JTextField(product.getBrand(), 20);
 
@@ -244,7 +246,13 @@ public class BeautyProductCatalogInterface {
         panel.add(createLabelAndField("Name:", nameField));
         panel.add(createLabelAndField("Price:", priceField));
         panel.add(createLabelAndField("Description:", descriptionField));
-        panel.add(createLabelAndField("Category:", categoryField));
+        JPanel categoryPanel = new JPanel();
+        categoryPanel.setLayout(new BoxLayout(categoryPanel, BoxLayout.X_AXIS));
+        categoryPanel.add(new JLabel("Category:"));
+
+        categoryBox.setSelectedItem(product.getCategory());
+        categoryPanel.add(categoryBox);
+        panel.add(categoryPanel);
         panel.add(createLabelAndField("Rating:", ratingField));
         panel.add(createLabelAndField("Brand:", brandField));
         //TODO add edit image option
@@ -260,7 +268,7 @@ public class BeautyProductCatalogInterface {
             String name = nameField.getText().trim();
             String priceText = priceField.getText().trim();
             String description = descriptionField.getText().trim();
-            String category = categoryField.getText().trim();
+            String category = categories[categoryBox.getSelectedIndex()];
             String ratingText = ratingField.getText().trim();
             String brand = brandField.getText().trim();
 
@@ -402,7 +410,6 @@ public class BeautyProductCatalogInterface {
         JTextField typeField = new JTextField();
         JTextField ratingField = new JTextField();
 
-        String[] categories = {"All", "lipstick", "liquid", "powder", "palette", "pencil", "cream", "mineral", "lip_stain"};
         JComboBox<String> categoryField = new JComboBox<>(categories);
 
         JPanel panel = new JPanel(new GridLayout(8, 2, 5, 5));

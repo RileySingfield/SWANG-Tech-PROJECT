@@ -1509,16 +1509,6 @@
   "image_link" : "https://d3t32hsnjxo7q6.cloudfront.net/i/be04329866e96a0077545d230489d7a9_ra,w158,h184_pa,w158,h184.jpeg",
   "product_type" : "lipstick"
 }, {
-  "id" : 99,
-  "brand" : "dr. hauschka",
-  "name" : "Dr. Hauschka Limited Edition Lipstick Novum",
-  "price" : "27.0",
-  "description" : "This Dr. Hauschka Lipstick leaves the lips feeling soft and silky thanks  to its composition of premium argan oil and beeswax, as well as mineral  pigments and medicinal plant extracts.  The colour of the slim-liner  combines with the natural red of the lips to create completely uniquenuances of colour.Ingredients: Ricinus  Communis (Castor) Seed Oil, Simmondsia Chinensis (Jojoba) Seed Oil,  Rosa Canina Fruit Extract, Lanolin, Beeswax (Cera Alba), Mica, Daucus  Carota Sativa (Carrot) Root Extract, Argania Spinosa Kernel Oil,  Euphorbia Cerifera (Candelilla) Wax, Copernicia Cerifera (Carnauba) Wax,  Rosa Damascena Flower Extract, Anthyllis Vulneraria Extract, Prunus  Amygdalus Dulcis (Sweet Almond) Oil, Prunus Armeniaca (Apricot) Kernel  Oil, Hydrogenated Jojoba Oil, Rosa Damascena Flower Wax, Fragrance  (Parfum), Linalool*, Benzyl Benzoate*, Farnesol*, Limonene*, Geraniol*,  Benzyl Salicylate*, Eugenol*, Citronellol*, Benzyl Alcohol*,  Maltodextrin, Lecithin, Silica, Carmine (CI 75470), Iron Oxides (CI  77491, CI 77492, CI 77499), Titanium Dioxide (CI 77891).  *component of  natural essential oils",
-  "category" : "lipstick",
-  "rating" : 5.0,
-  "image_link" : "https://d3t32hsnjxo7q6.cloudfront.net/i/5876ec738df72b74a0aac649415a452f_ra,w158,h184_pa,w158,h184.jpg",
-  "product_type" : "lipstick"
-}, {
   "id" : 96,
   "brand" : "revlon",
   "name" : "Revlon Ultra HD Lip Lacquer",
@@ -1868,4 +1858,34 @@
   "rating" : 4.3,
   "image_link" : "https://d3t32hsnjxo7q6.cloudfront.net/i/b66c56aeb8d078123cca4c9c64d17cb9_ra,w158,h184_pa,w158,h184.jpeg",
   "product_type" : "lipstick"
+}, {
+  "id" : 1,
+  "brand" : "BrandX",
+  "name" : "Lipstick",
+  "price" : "19.99",
+  "description" : "A great lipstick",
+  "category" : "Makeup",
+  "rating" : 4.5,
+  "image_link" : "image.webp",
+  "product_type" : "Cosmetic"
+}, {
+  "id" : 3,
+  "brand" : "BrandZ",
+  "name" : "Mascara",
+  "price" : "15.00",
+  "description" : "Waterproof mascara",
+  "category" : "Makeup",
+  "rating" : 4.2,
+  "image_link" : "image.webp",
+  "product_type" : "Cosmetic"
+}, {
+  "id" : 4,
+  "brand" : "BrandA",
+  "name" : "Eyeliner",
+  "price" : "10.00",
+  "description" : "Smooth eyeliner",
+  "category" : "Makeup",
+  "rating" : 4.3,
+  "image_link" : "image.webp",
+  "product_type" : "Cosmetic"
 } ]

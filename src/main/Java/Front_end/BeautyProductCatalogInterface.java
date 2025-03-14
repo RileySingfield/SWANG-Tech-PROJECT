@@ -573,9 +573,6 @@ public class BeautyProductCatalogInterface {
         //TODO move this right
         topPanel.add(usernameLabel);
         topPanel.add(logoutButton);
-        logoutButton.addActionListener(e -> {
-            userManager.logout();
-        });
 
         // FILTER
         JPanel filterPanel = new JPanel();
@@ -730,11 +727,20 @@ public class BeautyProductCatalogInterface {
 
         // Add Button Action Listener
         addButton.addActionListener(e -> showAddProductDialog());
+
+        logoutButton.addActionListener(e -> {
+            userManager.logout();
+            frame.remove(catalogPanel);
+            frame.remove(mainSplitPane);
+            frame.remove(topPanel);
+            loginScreen();
+        });
     }
 
     public void loginScreen(){
         //TODO add option to use as guest
         JPanel loginPanel = new JPanel();
+        loginPanel.requestFocus();
         loginPanel.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.insets = new Insets(5,5,5,5);
@@ -826,6 +832,7 @@ public class BeautyProductCatalogInterface {
         });
         registerButton.addActionListener(e -> {
             loginPanel.setVisible(false);
+            frame.remove(loginPanel);
             registerScreen();
         });
 
@@ -934,7 +941,7 @@ public class BeautyProductCatalogInterface {
         });
 
         loginButton.addActionListener(e -> {
-            registerPanel.setVisible(false);
+            frame.remove(registerPanel);
             loginScreen();
         });
         registerPanel.setVisible(true);

@@ -564,6 +564,7 @@ public class BeautyProductCatalogInterface {
         //show username and status
         //TODO add a dropdown menu to sign out or change accounts
         JLabel usernameLabel = new JLabel(userManager.getLoggedInUser().getUsername());
+        JButton logoutButton = new JButton("Logout");
 
 
         topPanel.add(searchPanel);
@@ -571,6 +572,10 @@ public class BeautyProductCatalogInterface {
         topPanel.add(addButton);
         //TODO move this right
         topPanel.add(usernameLabel);
+        topPanel.add(logoutButton);
+        logoutButton.addActionListener(e -> {
+            userManager.logout();
+        });
 
         // FILTER
         JPanel filterPanel = new JPanel();

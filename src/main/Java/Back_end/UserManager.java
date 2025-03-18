@@ -14,6 +14,10 @@ public class UserManager {
         users.put("generalUserAminah", new ProductUser("generalUserAminah", "passwd2", "regular"));
     }
 
+    public boolean userExists(String username) {
+        return users.containsKey(username);
+    }
+
     public boolean login(String username, String password) {
         ProductUser user = users.get(username);
         if (user != null && (user.getPassword()).equals(password)) {

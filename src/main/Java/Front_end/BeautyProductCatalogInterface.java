@@ -16,6 +16,8 @@ import java.util.concurrent.Executors;
 import java.awt.image.BufferedImage;
 import java.net.URL;
 
+import static java.lang.String.format;
+
 public class BeautyProductCatalogInterface {
     private JFrame frame;
     private JPanel catalogPanel;
@@ -57,7 +59,6 @@ public class BeautyProductCatalogInterface {
 
         loginScreen();
         //catalogScreen();
-
     }
 
     private void loadProducts(List<Product> products) {
@@ -152,8 +153,15 @@ public class BeautyProductCatalogInterface {
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setOpaque(false);
         headerPanel.setBorder(new EmptyBorder(0, 0, 10, 0));
+        String priceS;
+        try{
+            float price = Float.parseFloat(product.getPrice());
+            priceS = format("%.2f",price);
+        }catch (NumberFormatException e){
+            priceS = product.getPrice();
+        }
 
-        JLabel priceLabel = new JLabel("Price: " + product.getPrice());
+        JLabel priceLabel = new JLabel("Price: $" + priceS);
         JLabel nameLabel = new JLabel(product.getName());
         nameLabel.setHorizontalAlignment(SwingConstants.CENTER);
         nameLabel.setFont(new Font("SansSerif", Font.BOLD, 16));
@@ -208,13 +216,13 @@ public class BeautyProductCatalogInterface {
         descriptionArea.setEditable(false);
         descriptionArea.setBorder(javax.swing.BorderFactory.createEmptyBorder());
         descriptionArea.setOpaque(false);
-        descriptionArea.setMaximumSize(new Dimension(250, 600));
         descriptionArea.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         JScrollPane scrollPane = new JScrollPane(descriptionArea);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setBorder(javax.swing.BorderFactory.createEmptyBorder());
+        scrollPane.setPreferredSize(new Dimension(150, 400));
 
         JLabel ratingLabel = new JLabel("Rating: " + product.getRating());
         ratingLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -801,7 +809,7 @@ public class BeautyProductCatalogInterface {
         //TODO login button doesnt work quite yet, shows errors but something is wrong with something
 
         //TEMP
-        JButton override = new JButton("Override");
+        JButton override = new JButton("Continue as Guest");
         c.gridx=1;
         c.gridy =5;
         loginPanel.add(override, c);
@@ -813,7 +821,9 @@ public class BeautyProductCatalogInterface {
 
 
         override.addActionListener(e -> {
+            userManager.login("guest","123");
             loginPanel.setVisible(false);
+            frame.remove(loginPanel);
             catalogScreen();
         });
 
@@ -882,6 +892,8 @@ public class BeautyProductCatalogInterface {
         registerPanel.add(passwordField, c);
         c.gridx=0;
         c.gridy =3;
+        JLabel password2Label = new JLabel("Re-enter Password:");
+        registerPanel.add(password2Label, c);
         JPasswordField passwordField2 = new JPasswordField(20);
         passwordField2.setEditable(true);
         passwordField2.setMinimumSize(new Dimension(120, 25));
@@ -894,7 +906,7 @@ public class BeautyProductCatalogInterface {
 
 
         //warning message
-        JLabel warningEmpty = new JLabel("Please enter a username and password.");
+        JLabel warningEmpty = new JLabel("Please fill in all fields.");
         warningEmpty.setForeground(Color.RED);
         warningEmpty.setVisible(false);
         c.gridx=1;
@@ -938,9 +950,7 @@ public class BeautyProductCatalogInterface {
                 warningWrong.setVisible(true);
                 warningTaken.setVisible(false);
                 warningEmpty.setVisible(false);
-            }else if(false) {
-                //if username is taken
-                //TODO
+            }else if(userManager.userExists(username)) {
                 warningWrong.setVisible(false);
                 warningTaken.setVisible(true);
                 warningEmpty.setVisible(false);

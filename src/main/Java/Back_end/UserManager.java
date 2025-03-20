@@ -24,6 +24,7 @@ public class UserManager {
             loggedInUser = user;
             return true;
         }
+
         return false;
     }
 

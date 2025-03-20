@@ -13,7 +13,7 @@ public class UserManagerTest {
 
     @BeforeEach
     void setUp() {
-        userManager = new UserManager(); // Reset user manager before each test
+        userManager = new UserManager();
     }
 
     @Test

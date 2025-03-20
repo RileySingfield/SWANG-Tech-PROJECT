@@ -12,7 +12,7 @@ public class ProductManagerTest {
 
     @BeforeEach
     void setUp() {
-        productManager = new ProductManager(); // No userManager dependency for now
+        productManager = new ProductManager();
     }
 
     @Test

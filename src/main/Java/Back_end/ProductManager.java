@@ -64,34 +64,45 @@ public class ProductManager {
     // Add a new product
     public boolean addProduct(Product product) {
         if (product == null) {
-            return false; // Prevent null products
+            return false;
         }
         if (products == null) {
-            products = new ArrayList<>(); // Ensure list is initialized
+            products = new ArrayList<>();
         }
+
+        for (Product existingProduct : products) {
+            if (existingProduct.getName().equalsIgnoreCase(product.getName()) &&
+                    existingProduct.getBrand().equalsIgnoreCase(product.getBrand())) {
+                return false;
+            }
+        }
+
         products.add(product);
         saveToFile();
         return true;
     }
+
     // Update a product
     public boolean updateProduct(int id, Product updatedProduct) {
         if (updatedProduct == null) {
             throw new IllegalArgumentException("Updated product cannot be null.");
         }
 
-        for (int i = 0; i < products.size(); i++) {
-            Product existingProduct = products.get(i);
-            if (existingProduct.getId() == id) {
-                // Update only the editable fields
-                existingProduct.setName(updatedProduct.getName());
-                existingProduct.setPrice(updatedProduct.getPrice());
-                existingProduct.setDescription(updatedProduct.getDescription());
-                existingProduct.setCategory(updatedProduct.getCategory());
-                existingProduct.setRating(updatedProduct.getRating());
-                existingProduct.setBrand(updatedProduct.getBrand());
+        else {
+            for (int i = 0; i < products.size(); i++) {
+                Product existingProduct = products.get(i);
+                if (existingProduct.getId() == id) {
+                    // Update only the editable fields
+                    existingProduct.setName(updatedProduct.getName());
+                    existingProduct.setPrice(updatedProduct.getPrice());
+                    existingProduct.setDescription(updatedProduct.getDescription());
+                    existingProduct.setCategory(updatedProduct.getCategory());
+                    existingProduct.setRating(updatedProduct.getRating());
+                    existingProduct.setBrand(updatedProduct.getBrand());
 
-                saveToFile();
-                return true;
+                    saveToFile();
+                    return true;
+                }
             }
         }
         return false;
@@ -176,4 +187,5 @@ public class ProductManager {
         }
         return false;
     }
+
 }

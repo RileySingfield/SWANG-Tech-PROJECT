@@ -9,7 +9,7 @@ public class UserManager {
 
     // Default users
     public UserManager() {
-        users.put("adminAminah", new ProductUser("adminAminah", "passwd1"));
+        users.put("Aminah", new ProductUser("Aminah", "passwd1"));
         users.put("gillian", new ProductUser("gillian", "test"));
     }
 

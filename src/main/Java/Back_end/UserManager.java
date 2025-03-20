@@ -6,25 +6,31 @@ import java.util.Map;
 public class UserManager {
     private Map<String, ProductUser> users = new HashMap<>();
     private ProductUser loggedInUser = null;
-    //TODO add register method
-    //TODO add a method that checks if a username is taken already
+
+    // Default users
     public UserManager() {
-        users.put("adminAminah", new ProductUser("adminAminah", "passwd1", "admin"));
-        users.put("gillian", new ProductUser("gillian", "test", "admin"));
-        users.put("generalUserAminah", new ProductUser("generalUserAminah", "passwd2", "regular"));
+        users.put("adminAminah", new ProductUser("adminAminah", "passwd1"));
+        users.put("gillian", new ProductUser("gillian", "test"));
     }
 
     public boolean userExists(String username) {
         return users.containsKey(username);
     }
 
+    public boolean register(String username, String password) {
+        if (userExists(username)) {
+            return false;
+        }
+        users.put(username, new ProductUser(username, password));
+        return true;
+    }
+
     public boolean login(String username, String password) {
         ProductUser user = users.get(username);
-        if (user != null && (user.getPassword()).equals(password)) {
+        if (user != null && user.getPassword().equals(password)) {
             loggedInUser = user;
             return true;
         }
-
         return false;
     }
 
@@ -35,9 +41,4 @@ public class UserManager {
     public ProductUser getLoggedInUser() {
         return loggedInUser;
     }
-
-    public boolean isAdmin() {
-        return loggedInUser != null && loggedInUser.isAdmin();
-    }
 }
-

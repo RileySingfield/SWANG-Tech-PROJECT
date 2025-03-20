@@ -1,14 +1,14 @@
 package Back_end;
 
+
 public class ProductUser {
     private String username;
+    private String passwordHash;
     private String password;
-    private String userType;
 
-    public ProductUser (String username, String password, String userType){
-        this.username= username;
+    public ProductUser(String username, String password) {
+        this.username = username;
         this.password= password;
-        this.userType= userType;
     }
 
     public String getUsername() {
@@ -19,12 +19,5 @@ public class ProductUser {
         return password;
     }
 
-    public String getUserType() {
-        return userType;
-    }
-
-    public boolean isAdmin() {
-        return "admin".equalsIgnoreCase(userType);
-    }
-
 }
+

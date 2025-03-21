@@ -5,9 +5,13 @@ import Back_end.Product;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
@@ -408,19 +412,31 @@ public class BeautyProductCatalogInterface {
         }
     }
 
+    private FileFilter webpFilter = new FileFilter() {
+        @Override
+        public boolean accept(File file) {
+            return file.isFile() && file.getName().toLowerCase().endsWith(".webp");
+        }
+
+        @Override
+        public String getDescription() {
+            return "";
+        }
+    };
     private void showAddProductDialog() {
-        JTextField URLField = new JTextField();
-        //TODO improve image adding window
         JTextField brandField = new JTextField();
         JTextField nameField = new JTextField();
         JTextField priceField = new JTextField();
         JTextField descriptionField = new JTextField();
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setFileFilter(webpFilter);
         JTextField typeField = new JTextField();
         JTextField ratingField = new JTextField();
 
         JComboBox<String> categoryField = new JComboBox<>(categories);
 
-        JPanel panel = new JPanel(new GridLayout(8, 2, 5, 5));
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.add(new JLabel("Brand:"));
         panel.add(brandField);
         panel.add(new JLabel("Name:"));
@@ -428,7 +444,7 @@ public class BeautyProductCatalogInterface {
         panel.add(new JLabel("Price:"));
         panel.add(priceField);
         panel.add(new JLabel("WEBP Image URL:"));
-        panel.add(URLField);
+        panel.add(fileChooser);
         panel.add(new JLabel("Description:"));
         panel.add(descriptionField);
         panel.add(new JLabel("Category:"));
@@ -474,13 +490,17 @@ public class BeautyProductCatalogInterface {
                 // Generate a new ID
                 int newId = generateNewId();
 
+                //generate URL for picture
+                URL img = fileChooser.getSelectedFile().toURI().toURL();
+                String newURL = img.toString();
+
                 // Create the new product
                 Product newProduct = new Product(
                         newId,
                         brandField.getText().trim(),
                         nameField.getText().trim(),
                         priceField.getText().trim(),
-                        URLField.getText().trim(),
+                        newURL,
                         descriptionField.getText().trim(),
                         (String)categoryField.getSelectedItem(),
                         typeField.getText().trim(),
@@ -491,7 +511,6 @@ public class BeautyProductCatalogInterface {
                 productManager.addProduct(newProduct);
 
                 // Clear the fields
-                URLField.setText("");
                 brandField.setText("");
                 nameField.setText("");
                 priceField.setText("");
@@ -507,6 +526,8 @@ public class BeautyProductCatalogInterface {
                 JOptionPane.showMessageDialog(frame, "Product added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(frame, "Invalid numeric value for Price or Rating.", "Error", JOptionPane.ERROR_MESSAGE);
+            } catch (MalformedURLException e) {
+                throw new RuntimeException(e);
             }
         }
     }
@@ -837,7 +858,6 @@ public class BeautyProductCatalogInterface {
                 warningWrong.setVisible(false);
             }else{
                 boolean success = userManager.login(username, password);
-                //TODO add username.Exists()
                 if(!success){
                     warningWrong.setVisible(true);
                     warningEmpty.setVisible(false);
@@ -955,7 +975,7 @@ public class BeautyProductCatalogInterface {
                 warningTaken.setVisible(true);
                 warningEmpty.setVisible(false);
             }else{
-                userManager.login(username,password);
+                userManager.register(username,password);
                 registerPanel.setVisible(false);
                 catalogScreen();
             }

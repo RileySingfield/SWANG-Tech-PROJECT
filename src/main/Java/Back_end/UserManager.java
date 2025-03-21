@@ -22,6 +22,7 @@ public class UserManager {
             return false;
         }
         users.put(username, new ProductUser(username, password));
+        loggedInUser = users.get(username);
         return true;
     }
 

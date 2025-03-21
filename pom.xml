@@ -20,13 +20,12 @@
             <artifactId>jackson-databind</artifactId>
             <version>2.13.4.2</version>
         </dependency>
-
+        <!--Webp converter-->
         <dependency>
             <groupId>org.sejda.imageio</groupId>
             <artifactId>webp-imageio</artifactId>
             <version>0.1.6</version>
         </dependency>
-
         <!-- JavaFX Dependencies -->
         <dependency>
             <groupId>org.openjfx</groupId>

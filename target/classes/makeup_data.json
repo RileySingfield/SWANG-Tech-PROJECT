@@ -1858,14 +1858,4 @@
   "rating" : 4.3,
   "image_link" : "https://d3t32hsnjxo7q6.cloudfront.net/i/b66c56aeb8d078123cca4c9c64d17cb9_ra,w158,h184_pa,w158,h184.jpeg",
   "product_type" : "lipstick"
-},{
-  "id" : 462,
-  "brand" : "test2",
-  "name" : "test",
-  "price" : "3",
-  "description" : "help",
-  "category" : "lipstick",
-  "rating" : 4.0,
-  "image_link" : "file:/C:/Users/gilli/OneDrive/Pictures/Saved%20Pictures/silly%20old%20men/balls.webp",
-  "product_type" : "test"
 } ]

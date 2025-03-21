@@ -37,13 +37,6 @@ To run unit tests:
 mvn test
 ```
 
-## Deploying to a Server
-If deploying on a remote server, copy the JAR file and run it:
-```sh
-scp target/beauty-product-catalog-1.0-SNAPSHOT.jar user@server:/path/to/deploy
-ssh user@server 'java -jar /path/to/deploy/beauty-product-catalog-1.0-SNAPSHOT.jar'
-```
-
 ## Troubleshooting
 - If Maven is not found, install it from [Maven Apache](https://maven.apache.org/download.cgi).
 - Ensure Java 17+ is installed (`java -version`).

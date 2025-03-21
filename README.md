@@ -49,6 +49,4 @@ ssh user@server 'java -jar /path/to/deploy/beauty-product-catalog-1.0-SNAPSHOT.j
 - Ensure Java 17+ is installed (`java -version`).
 - Check for missing dependencies using `mvn dependency:resolve`.
 
-Happy Coding! 🚀
-
 

@@ -1,0 +1,31 @@
+#!/bin/bash
+# Build Script for Unix/Linux
+# This script compiles, tests, and runs the Java project
+# Ensure Maven is installed
+if ! command -v mvn &> /dev/null
+then
+    echo "Maven not found. Please install Maven before proceeding."
+    exit 1
+fi
+# Clean previous build
+mvn clean
+# Compile and package
+mvn package
+# Run the application
+java -jar target/beauty-product-catalog-1.0-SNAPSHOT.jar
+# Windows Batch Script (build.bat)
+@echo off
+REM Build Script for Windows
+REM This script compiles, tests, and runs the Java project
+REM Ensure Maven is installed
+where mvn >nul 2>nul
+if %ERRORLEVEL% neq 0 (
+    echo Maven not found. Please install Maven before proceeding.
+    exit /b 1
+)
+REM Clean previous build
+mvn clean
+REM Compile and package
+mvn package
+REM Run the application
+java -jar target\beauty-product-catalog-1.0-SNAPSHOT.jar

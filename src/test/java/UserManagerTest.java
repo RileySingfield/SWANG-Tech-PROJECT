@@ -53,8 +53,8 @@ public class UserManagerTest {
         userManager.logout();
         assertNull(userManager.getLoggedInUser(), "User should be logged out");
     }
-/*
-    @Test
+
+    /*@Test
     void testAddToWishlist() {
         boolean success = userManager.addToWishlist("Aminah", testProduct);
         assertTrue(success, "Product should be added to wishlist.");

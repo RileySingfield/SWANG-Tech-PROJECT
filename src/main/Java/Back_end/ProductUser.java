@@ -1,13 +1,15 @@
 package Back_end;
 
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ProductUser {
     private String username;
     private String password;
-    private Map<Integer, Product> wishlist = new HashMap<>();
+    private List<Product> wishlist= new ArrayList<Product>();
 
     public ProductUser(String username, String password) {
         this.username = username;
@@ -22,22 +24,28 @@ public class ProductUser {
         return password;
     }
 
-    public Map<Integer, Product> getWishlist() {
+    public List<Product> getWishlist() {
         return wishlist;
     }
 
     public boolean addToWishlist(Product product) {
-        if (!wishlist.containsKey(product.getId())) {
-            wishlist.put(product.getId(), product);
+        if(wishlist!=null) {
+            if (!wishlist.contains(product)) {
+                wishlist.add(product);
+                return true;
+            }
+        }else{
+            wishlist.add(product);
             return true;
         }
+
         //if already in wishlist
         return false;
     }
 
-    public boolean removeFromWishlist(int productId) {
-        if (wishlist.containsKey(productId)) {
-            wishlist.remove(productId);
+    public boolean removeFromWishlist(Product product) {
+        if (wishlist.contains(product)) {
+            wishlist.remove(product);
             return true;
         }
         return false;

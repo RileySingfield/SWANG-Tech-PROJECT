@@ -61,11 +61,13 @@ public class BeautyProductCatalogInterface {
         frame.setSize(1600, 800);
         frame.getContentPane().setBackground(new Color(245, 245, 245));
 
-        loginScreen();
+        //loginScreen();
         //catalogScreen();
+        userManager.login("gillian","test");
+        wishListScreen();
     }
 
-    private void loadProducts(List<Product> products) {
+    private void loadProducts(List<Product> products,JPanel panel) {
         catalogPanel.removeAll(); // Clear panel efficiently
 
         for (Product product : products) {
@@ -114,11 +116,11 @@ public class BeautyProductCatalogInterface {
 
             productCard.add(imageLabel, BorderLayout.CENTER);
             productCard.add(detailsButton, BorderLayout.SOUTH);
-            catalogPanel.add(productCard);
+            panel.add(productCard);
         }
 
-        catalogPanel.revalidate();
-        catalogPanel.repaint();
+        panel.revalidate();
+        panel.repaint();
     }
 
     public ImageIcon fetchProductImage(String imageUrl) throws IOException {
@@ -198,6 +200,30 @@ public class BeautyProductCatalogInterface {
         buttonPanel.add(editButton);
         buttonPanel.add(deleteButton);
         buttonPanel.add(closeButton);
+
+        JButton wishlistButton = new JButton("Add to Wishlist");
+        wishlistButton.setBackground(Color.WHITE);
+        wishlistButton.setOpaque(true);
+        wishlistButton.setBorderPainted(false);
+        buttonPanel.add(wishlistButton);
+        wishlistButton.addActionListener(e -> {
+            userManager.getLoggedInUser().addToWishlist(product);
+        });
+        if(userManager.getLoggedInUser().getWishlist()!=null){
+            if(userManager.getLoggedInUser().getWishlist().contains(product)) {
+                JButton removeButton = new JButton("Remove from Wishlist");
+                removeButton.setBackground(Color.WHITE);
+                removeButton.setOpaque(true);
+                removeButton.setBorderPainted(false);
+                removeButton.addActionListener(e -> {
+                    userManager.getLoggedInUser().removeFromWishlist(product);
+                });
+                buttonPanel.add(removeButton);
+            }
+        }
+
+
+
 
         headerPanel.add(nameLabel, BorderLayout.CENTER);
         bottomPanel.add(buttonPanel, BorderLayout.EAST);
@@ -331,7 +357,7 @@ public class BeautyProductCatalogInterface {
                 if (success) {
                     // Refresh UI
                     showProductDetails(updatedProduct);
-                    loadProducts(productManager.getAllProducts());
+                    loadProducts(productManager.getAllProducts(),catalogPanel);
                     return; // Exit the method if successful
                 } else {
                     JOptionPane.showMessageDialog(frame, "Failed to update product.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -375,7 +401,7 @@ public class BeautyProductCatalogInterface {
             results = productManager.filterProducts(results, selectedCategory, minPrice, maxPrice, minRating); // Apply filters to search results
         }
 
-        loadProducts(results); // Load the combined results
+        loadProducts(results,catalogPanel); // Load the combined results
     }
 
     private double getMinPriceFromDropdown(String priceRange) {
@@ -520,7 +546,7 @@ public class BeautyProductCatalogInterface {
                 ratingField.setText("");
 
                 // Refresh the product list
-                loadProducts(productManager.getAllProducts());
+                loadProducts(productManager.getAllProducts(),catalogPanel);
 
                 // Show success message
                 JOptionPane.showMessageDialog(frame, "Product added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
@@ -550,7 +576,7 @@ public class BeautyProductCatalogInterface {
                     JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
                 productManager.deleteProduct(selectedProduct.getId());
-                loadProducts(productManager.getAllProducts());
+                loadProducts(productManager.getAllProducts(),catalogPanel);
                 closeDetailPanel();
                 selectedProduct = null;
             }
@@ -596,6 +622,16 @@ public class BeautyProductCatalogInterface {
         addButton.setBackground(Color.WHITE);
         addButton.setOpaque(true);
         addButton.setBorderPainted(false);
+
+        //WISHLIST BUTTON
+        JButton wishlist =  new JButton("Wishlist");
+        wishlist.setBackground(Color.WHITE);
+        wishlist.setOpaque(true);
+        wishlist.setBorderPainted(false);
+        if(userManager.getLoggedInUser()!=null){
+            //todo display button
+            topPanel.add(wishlist);
+        }
 
         //show username and status
         //TODO add a dropdown menu to sign out or change accounts
@@ -691,7 +727,7 @@ public class BeautyProductCatalogInterface {
             categoryDropdown.setSelectedIndex(0); // Reset category dropdown to "All"
 
             // Reload all products
-            loadProducts(productManager.getAllProducts());
+            loadProducts(productManager.getAllProducts(),catalogPanel);
         });
 
         filterPanel.add(categoryPanel);
@@ -731,13 +767,15 @@ public class BeautyProductCatalogInterface {
                 results = productManager.filterProducts(results, selectedCategory, minPrice, maxPrice, minRating); // Apply filters to search results
             }
 
-            loadProducts(results); // Load the combined results
+            loadProducts(results,catalogPanel); // Load the combined results
         });
+
+
 
         catalogPanel = new JPanel();
         catalogPanel.setBackground(Color.WHITE);
         catalogPanel.setLayout(new GridLayout(0, 3, 10, 10));
-        loadProducts(productManager.getAllProducts());
+        loadProducts(productManager.getAllProducts(),catalogPanel);
         JScrollPane catalogScrollPane = new JScrollPane(catalogPanel);
         catalogScrollPane.setBorder(null);
         catalogScrollPane.getViewport().setBackground(Color.WHITE);
@@ -769,6 +807,13 @@ public class BeautyProductCatalogInterface {
             }
         });
 
+        wishlist.addActionListener(e->{
+            if(userManager.getLoggedInUser().getWishlist()!=null) {
+                frame.remove(topPanel);
+                frame.remove(mainSplitPane);
+                wishListScreen();
+            }
+        });
 
         // Remove Search Button Action Listener
         removeSearchButton.addActionListener(e -> {
@@ -781,7 +826,7 @@ public class BeautyProductCatalogInterface {
             int minRating = sliderRating.getValue();
             String selectedCategory = categoryDropdown.getSelectedItem().toString();
 
-            loadProducts(productManager.filterProducts(productManager.getAllProducts(), selectedCategory, minPrice, maxPrice, minRating));
+            loadProducts(productManager.filterProducts(productManager.getAllProducts(), selectedCategory, minPrice, maxPrice, minRating),catalogPanel);
         });
 
         // Add Button Action Listener
@@ -794,6 +839,25 @@ public class BeautyProductCatalogInterface {
             frame.remove(topPanel);
             loginScreen();
         });
+    }
+
+    public void wishListScreen() {
+        JPanel wishListPanel = new JPanel();
+        wishListPanel.setBackground(Color.WHITE);
+        String name = userManager.getLoggedInUser().getUsername();
+        JLabel wishListLabel = new JLabel(name+"'s Wishlist:");
+        wishListPanel.add(wishListLabel);
+        //loadProducts(userManager.getLoggedInUser().getWishlist(),wishListPanel);
+        //make a back button
+        JButton backButton = new JButton("Back");
+        wishListPanel.add(backButton);
+        backButton.addActionListener(e -> {
+            frame.remove(wishListPanel);
+            catalogScreen();
+        });
+        wishListPanel.setVisible(true);
+        frame.add(wishListPanel);
+        frame.setVisible(true);
     }
 
     public void loginScreen(){
@@ -847,8 +911,6 @@ public class BeautyProductCatalogInterface {
         loginPanel.add(warningEmpty, c);
         loginPanel.add(warningWrong, c);
 
-        //TODO login button doesnt work quite yet, shows errors but something is wrong with something
-
         //TEMP
         JButton override = new JButton("Continue as Guest");
         c.gridx=1;
@@ -862,7 +924,8 @@ public class BeautyProductCatalogInterface {
 
 
         override.addActionListener(e -> {
-            userManager.login("guest","123");
+            //use the general account
+            userManager.login("guest","0");
             loginPanel.setVisible(false);
             frame.remove(loginPanel);
             catalogScreen();

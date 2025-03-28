@@ -61,10 +61,8 @@ public class BeautyProductCatalogInterface {
         frame.setSize(1600, 800);
         frame.getContentPane().setBackground(new Color(245, 245, 245));
 
-        //loginScreen();
+        loginScreen();
         //catalogScreen();
-        userManager.login("gillian","test");
-        wishListScreen();
     }
 
     private void loadProducts(List<Product> products,JPanel panel) {
@@ -847,7 +845,7 @@ public class BeautyProductCatalogInterface {
         String name = userManager.getLoggedInUser().getUsername();
         JLabel wishListLabel = new JLabel(name+"'s Wishlist:");
         wishListPanel.add(wishListLabel);
-        //loadProducts(userManager.getLoggedInUser().getWishlist(),wishListPanel);
+        loadProducts(userManager.getLoggedInUser().getWishlist(),wishListPanel);
         //make a back button
         JButton backButton = new JButton("Back");
         wishListPanel.add(backButton);

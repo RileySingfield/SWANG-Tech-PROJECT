@@ -943,7 +943,7 @@ public class BeautyProductCatalogInterface {
         registerPanel.add(warningEmpty, c);
 
         //TEMP
-        JButton override = new JButton("Override");
+        JButton override = new JButton("Continue as guest");
         c.gridx=1;
         c.gridy =6;
         registerPanel.add(override, c);

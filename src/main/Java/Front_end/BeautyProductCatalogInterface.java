@@ -613,7 +613,7 @@ public class BeautyProductCatalogInterface {
         topPanel.add(addButton);
 
 
-        // FILTER
+        // FILTER PANEL
         JPanel filterPanel = new JPanel();
         filterPanel.setLayout(new BoxLayout(filterPanel, BoxLayout.Y_AXIS));
         filterPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -629,7 +629,9 @@ public class BeautyProductCatalogInterface {
         // Price filter
         JLabel priceLabel = new JLabel("Price Range:");
         priceDropdown = new JComboBox<>(new String[]{"All", "$0-10", "$10-20", "$20-30", "$30-40", "$40+"});
-        priceDropdown.setPreferredSize(new Dimension(200, 25));
+        priceDropdown.setPreferredSize(new Dimension(200, 1)); // this line is useless from what I can tell
+        // below line controls the size of the price dropdown button
+        priceDropdown.setMaximumSize(new Dimension(100, 40));
 
         JPanel priceDropdownPanel = new JPanel();
         priceDropdownPanel.setBackground(Color.WHITE);
@@ -639,6 +641,24 @@ public class BeautyProductCatalogInterface {
         priceDropdownPanel.add(priceDropdown);
         filterPanel.add(priceDropdownPanel);
         filterPanel.add(Box.createVerticalStrut(5));
+
+        // Category filter
+        JLabel categoryLabel = new JLabel("Category:");
+        categoryDropdown = new JComboBox<>(new String[]{"All", "lipstick", "liquid", "powder", "palette", "pencil", "cream", "mineral", "lip_stain"});
+        categoryDropdown.setPreferredSize(new Dimension(120, 25)); //this line is actually useless from what I can tell
+        // below line actually changes the size of the category drop down button
+        categoryDropdown.setMaximumSize(new Dimension(100, 40));
+
+        JButton applyCategoryFilter = new JButton("Apply");
+        JPanel categoryPanel = new JPanel();
+        categoryPanel.setBackground(Color.WHITE);
+        categoryPanel.setLayout(new BoxLayout(categoryPanel, BoxLayout.X_AXIS));
+        categoryPanel.add(categoryLabel);
+        categoryPanel.add(Box.createHorizontalStrut(5));
+        categoryPanel.add(categoryDropdown);
+        categoryPanel.add(Box.createHorizontalStrut(5));
+        categoryPanel.add(applyCategoryFilter);
+        filterPanel.add(categoryPanel);
 
         // Rating filter
         JLabel ratingLabel = new JLabel("Minimum Rating:");
@@ -657,20 +677,7 @@ public class BeautyProductCatalogInterface {
         filterPanel.add(ratingPanel);
         filterPanel.add(Box.createVerticalStrut(10));
 
-        // Category filter
-        JLabel categoryLabel = new JLabel("Category:");
-        categoryDropdown = new JComboBox<>(new String[]{"All", "lipstick", "liquid", "powder", "palette", "pencil", "cream", "mineral", "lip_stain"});
-        categoryDropdown.setPreferredSize(new Dimension(120, 25));
-        JButton applyCategoryFilter = new JButton("Apply");
-        JPanel categoryPanel = new JPanel();
-        categoryPanel.setBackground(Color.WHITE);
-        categoryPanel.setLayout(new BoxLayout(categoryPanel, BoxLayout.X_AXIS));
-        categoryPanel.add(categoryLabel);
-        categoryPanel.add(Box.createHorizontalStrut(5));
-        categoryPanel.add(categoryDropdown);
-        categoryPanel.add(Box.createHorizontalStrut(5));
-        categoryPanel.add(applyCategoryFilter);
-        filterPanel.add(categoryPanel);
+
 
         // Clear Filters Button
         JButton clearFiltersButton = new JButton("Clear Filters");
@@ -687,9 +694,22 @@ public class BeautyProductCatalogInterface {
             loadProducts(productManager.getAllProducts());
         });
 
-        // Add the Clear Filters button to the filter panel
+        filterPanel.add(categoryPanel);
         filterPanel.add(Box.createVerticalStrut(10));
-        filterPanel.add(clearFiltersButton);
+
+// Create a new panel to hold Apply and Clear Filters buttons
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+        buttonPanel.setBackground(Color.WHITE);
+
+// Add buttons to the new panel
+        buttonPanel.add(clearFiltersButton);
+        buttonPanel.add(Box.createHorizontalStrut(10)); // Space between buttons
+        buttonPanel.add(applyCategoryFilter);
+
+// Add the button panel to the filter panel
+        filterPanel.add(buttonPanel);
+
 
         // Apply Filters Button
         applyCategoryFilter.addActionListener(e -> {

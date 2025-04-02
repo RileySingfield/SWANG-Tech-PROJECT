@@ -40,16 +40,25 @@ public class BeautyProductCatalogInterface {
     private JSlider sliderRating;
     private JComboBox<String> categoryDropdown;
 
+    /**
+     *
+     *
+     */
     public BeautyProductCatalogInterface() {
         productManager = new ProductManager();
         initializeUI();
     }
 
+
+    /**
+     * This method sets the look and feel and initializes the frame
+     *
+     */
     private void initializeUI() {
         // Enable hardware acceleration
         System.setProperty("sun.java2d.opengl", "true");
 
-        // Set Nimbus look and feel for a softer appearance.
+        // Set Nimbus look and feel
         try {
             UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
         } catch (Exception ex) {
@@ -65,8 +74,16 @@ public class BeautyProductCatalogInterface {
         //catalogScreen();
     }
 
+    /**
+     * This method loads products and places them in the parameterized
+     * panel. It loads the label first and then the image, calling
+     * fetchProductImage with a URL.
+     *
+     * @param products
+     * @param panel
+     */
     private void loadProducts(List<Product> products,JPanel panel) {
-        catalogPanel.removeAll(); // Clear panel efficiently
+        panel.removeAll(); // Clear panel efficiently
 
         for (Product product : products) {
             JPanel productCard = new JPanel(new BorderLayout());
@@ -111,7 +128,7 @@ public class BeautyProductCatalogInterface {
                     ex.printStackTrace();
                 }
             });
-
+            productCard.setMaximumSize(new Dimension(200, 200));
             productCard.add(imageLabel, BorderLayout.CENTER);
             productCard.add(detailsButton, BorderLayout.SOUTH);
             panel.add(productCard);
@@ -121,6 +138,14 @@ public class BeautyProductCatalogInterface {
         panel.repaint();
     }
 
+    /**
+     * When passed a url (read from csv file), this method converts the
+     * URL into an ImageIcon, which is then returned to loadProducts.
+     *
+     * @param imageUrl
+     * @return
+     * @throws IOException
+     */
     public ImageIcon fetchProductImage(String imageUrl) throws IOException {
         if (imageCache.containsKey(imageUrl)) {
             return imageCache.get(imageUrl);
@@ -141,6 +166,14 @@ public class BeautyProductCatalogInterface {
         return imageIcon;
     }
 
+    /**
+     * This method checks that the URL found in the csv file is, in
+     * fact, a proper, working URL. It returns a boolean value true
+     * if it is a URL, and false if it isn't.
+     *
+     * @param url
+     * @return
+     */
     private boolean isURL(String url) {
         try {
             new URL(url);
@@ -150,6 +183,13 @@ public class BeautyProductCatalogInterface {
         }
     }
 
+    /**
+     * This product adds a panel to the split screen that shows details
+     * about the selected product. this is then displayed on the frame.
+     *
+     * @param product
+     * @throws IOException
+     */
     private void showProductDetails(Product product) throws IOException {
         detailPanel.removeAll();
         detailPanel.setLayout(new BorderLayout());
@@ -203,23 +243,29 @@ public class BeautyProductCatalogInterface {
         wishlistButton.setBackground(Color.WHITE);
         wishlistButton.setOpaque(true);
         wishlistButton.setBorderPainted(false);
-        buttonPanel.add(wishlistButton);
+
+        if(userManager.getLoggedInUser()!=null){
+            if(userManager.getLoggedInUser().getWishlist()!=null){
+                if(userManager.getLoggedInUser().getWishlist().contains(product)) {
+                    JButton removeButton = new JButton("Remove from Wishlist");
+                    removeButton.setBackground(Color.WHITE);
+                    removeButton.setOpaque(true);
+                    removeButton.setBorderPainted(false);
+                    removeButton.addActionListener(e -> {
+                        userManager.getLoggedInUser().removeFromWishlist(product);
+                    });
+                    buttonPanel.add(removeButton);
+                }else {
+                    buttonPanel.add(wishlistButton);
+
+                }
+            }else {
+                buttonPanel.add(wishlistButton);
+            }
+        }
         wishlistButton.addActionListener(e -> {
             userManager.getLoggedInUser().addToWishlist(product);
         });
-        if(userManager.getLoggedInUser().getWishlist()!=null){
-            if(userManager.getLoggedInUser().getWishlist().contains(product)) {
-                JButton removeButton = new JButton("Remove from Wishlist");
-                removeButton.setBackground(Color.WHITE);
-                removeButton.setOpaque(true);
-                removeButton.setBorderPainted(false);
-                removeButton.addActionListener(e -> {
-                    userManager.getLoggedInUser().removeFromWishlist(product);
-                });
-                buttonPanel.add(removeButton);
-            }
-        }
-
 
 
 
@@ -268,6 +314,11 @@ public class BeautyProductCatalogInterface {
         mainSplitPane.setDividerLocation((int) (frame.getWidth() * 0.66));
     }
 
+    /**
+     * When a user chooses to edit a product in the details panel,
+     * this screen will pop up and allow for the user to change details about the product.
+     * @param product
+     */
     private void showEditProductDialog(Product product) {
         JTextField nameField = new JTextField(product.getName(), 20);
         JTextField priceField = new JTextField(product.getPrice(), 20);
@@ -366,6 +417,13 @@ public class BeautyProductCatalogInterface {
         }
     }
 
+    /**
+     * helper method to create and pair label and text field.
+     *
+     * @param labelText
+     * @param textField
+     * @return
+     */
     private JPanel createLabelAndField(String labelText, JTextField textField) {
         JPanel rowPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         rowPanel.add(new JLabel(labelText));
@@ -373,6 +431,9 @@ public class BeautyProductCatalogInterface {
         return rowPanel;
     }
 
+    /**
+     * button to close the detail panel
+     */
     private void closeDetailPanel() {
         detailPanel.removeAll();
         detailPanel.revalidate();
@@ -380,6 +441,9 @@ public class BeautyProductCatalogInterface {
         mainSplitPane.setDividerLocation(frame.getWidth());
     }
 
+    /**
+     * use searchField to filter items in the display. then calls loadProducts to display them.
+     */
     private void performSearch() {
         String query = searchField.getText().trim();
         List<Product> results;
@@ -402,6 +466,11 @@ public class BeautyProductCatalogInterface {
         loadProducts(results,catalogPanel); // Load the combined results
     }
 
+    /**
+     * gets minimum price from values in choice box and returns it
+     * @param priceRange
+     * @return
+     */
     private double getMinPriceFromDropdown(String priceRange) {
         switch (priceRange) {
             case "$0-10":
@@ -419,6 +488,11 @@ public class BeautyProductCatalogInterface {
         }
     }
 
+    /**
+     * gets maximum price from values in choice box and returns it
+     * @param priceRange
+     * @return double
+     */
     private double getMaxPriceFromDropdown(String priceRange) {
         switch (priceRange) {
             case "$0-10":
@@ -556,7 +630,10 @@ public class BeautyProductCatalogInterface {
         }
     }
 
-    // Helper method to generate a new ID
+    /**
+     * when a new product is added, a new id is created here.
+     * @return int
+     */
     private int generateNewId() {
         int maxId = 0;
         for (Product product : productManager.getAllProducts()) {
@@ -567,6 +644,9 @@ public class BeautyProductCatalogInterface {
         return maxId + 1;
     }
 
+    /**
+     * confirms the user would like to remove the product and then removes it.
+     */
     private void performDeleteProduct() {
         if (selectedProduct != null) {
             int confirm = JOptionPane.showConfirmDialog(frame,
@@ -584,6 +664,9 @@ public class BeautyProductCatalogInterface {
         }
     }
 
+    /**
+     * this is the main display of the program. shows all products, filter and search panels.
+     */
     public void catalogScreen(){
         System.out.println("Catalog Screen");
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -634,10 +717,11 @@ public class BeautyProductCatalogInterface {
         //show username and status
         //TODO add a dropdown menu to sign out or change accounts
         if(userManager.getLoggedInUser()!=null){
-            JLabel usernameLabel = new JLabel(userManager.getLoggedInUser().getUsername());
-            //TODO move this right
-            topPanel.add(usernameLabel);
-
+            String user = userManager.getLoggedInUser().getUsername();
+            JLabel usernameLabel = new JLabel(user);
+            if(!user.equals("guest")){
+                topPanel.add(usernameLabel);
+            }
         }
         JButton logoutButton = new JButton("Logout");
         topPanel.add(logoutButton);
@@ -839,25 +923,36 @@ public class BeautyProductCatalogInterface {
         });
     }
 
+    /**
+     * shows products that have been added to a users wishlist in a seperate panel to the catalog screen.
+     */
     public void wishListScreen() {
         JPanel wishListPanel = new JPanel();
+        wishListPanel.setLayout(new BorderLayout(5,5));
         wishListPanel.setBackground(Color.WHITE);
         String name = userManager.getLoggedInUser().getUsername();
         JLabel wishListLabel = new JLabel(name+"'s Wishlist:");
-        wishListPanel.add(wishListLabel);
-        loadProducts(userManager.getLoggedInUser().getWishlist(),wishListPanel);
-        //make a back button
+        wishListLabel.setFont(new Font("Tahoma", Font.PLAIN, 112));
         JButton backButton = new JButton("Back");
-        wishListPanel.add(backButton);
+        JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.setBackground(Color.WHITE);
+        topPanel.add(wishListLabel,BorderLayout.CENTER);
+        topPanel.add(backButton,BorderLayout.WEST);
+        wishListPanel.add(topPanel,BorderLayout.PAGE_START);
         backButton.addActionListener(e -> {
             frame.remove(wishListPanel);
             catalogScreen();
         });
+        loadProducts(userManager.getLoggedInUser().getWishlist(),wishListPanel);
+        JScrollPane wishListScrollPane = new JScrollPane(wishListPanel);
         wishListPanel.setVisible(true);
-        frame.add(wishListPanel);
+        frame.add(wishListScrollPane, BorderLayout.CENTER);
         frame.setVisible(true);
     }
 
+    /**
+     * shows login fields and allows a user to log in
+     */
     public void loginScreen(){
         //TODO add option to use as guest
         JPanel loginPanel = new JPanel();
@@ -963,6 +1058,9 @@ public class BeautyProductCatalogInterface {
         frame.setVisible(true);
     }
 
+    /**
+     * shows register screen and allows a user to register/log in
+     */
     public void registerScreen(){
         JPanel registerPanel = new JPanel();
         registerPanel.setLayout(new GridBagLayout());
@@ -1071,6 +1169,10 @@ public class BeautyProductCatalogInterface {
         frame.setVisible(true);
     }
 
+    /**
+     * invoke GUI!
+     * @param args
+     */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(BeautyProductCatalogInterface::new);
     }

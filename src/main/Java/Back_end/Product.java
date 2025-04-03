@@ -7,22 +7,48 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * Represents a beauty product with attributes like brand, name, price, description, etc.
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Product {
+    /**
+     * Unique identifier for the product.
+     */
     private int id;
+    /**
+     * Brand of the product.
+     */
     private String brand;
+    /**
+     * Name of the product.
+     */
     private String name;
+    /**
+     * Price of the product in string format.
+     */
     private String price;
-
+    /**
+     * URL link to the product's image.
+     */
     @JsonProperty("image_link")
     private String imageLink;
-
+    /**
+     * Description of the product.
+     */
     private String description;
+    /**
+     * Product's category (e.g., lipstick, foundation).
+     */
     private String category;
-
+    /**
+     * Product type (e.g., makeup, skincare).
+     */
     @JsonProperty("product_type")
     private String productType;
-
+    /**
+     * User rating of the product.
+     */
     private Double rating;
 
     public Product(int id, String brand, String name, String price, String imageLink,

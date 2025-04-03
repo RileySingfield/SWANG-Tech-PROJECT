@@ -6,15 +6,23 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * Manages product data including loading, saving, searching, and filtering.
+ */
 public class ProductManager {
     private List<Product> products;
     private final String FILE_PATH = "src/main/resources/makeup_data.json";
-
+    /**
+     * Initializes ProductManager and loads products from JSON.
+     */
     public ProductManager() {
         this.products = readFile();
     }
-
+    /**
+     * Reads product data from JSON file.
+     *
+     * @return List of products loaded.
+     */
     // Read JSON file and load products
     public List<Product> readFile() {
         ObjectMapper mapper = new ObjectMapper();
@@ -42,6 +50,9 @@ public class ProductManager {
     }
 
     // Save changes to the JSON file
+    /**
+     * Saves current product list to JSON file.
+     */
     public void saveToFile() {
         ObjectMapper mapper = new ObjectMapper();
         try {
@@ -51,17 +62,28 @@ public class ProductManager {
         }
     }
 
-    // Get all products
+    /**
+     * Returns all products.
+     */
     public List<Product> getAllProducts() {
         return new ArrayList<>(products);
     }
 
-    // Get product by ID
+    /**
+     * Finds a product by its ID.
+     *
+     * @param id Product ID.
+     * @return Product if found, otherwise null.
+     */
     public Product getProductById(int id) {
         return products.stream().filter(product -> product.getId() == id).findFirst().orElse(null);
     }
 
-    // Add a new product
+    /**
+     * Adds a new product.
+     *
+     * @return true if added, false if duplicate or null.
+     */
     public boolean addProduct(Product product) {
         if (product == null) {
             return false;
@@ -82,7 +104,13 @@ public class ProductManager {
         return true;
     }
 
-    // Update a product
+    /**
+     * Updates an existing product.
+     *
+     * @param id ID of the product to update.
+     * @param updatedProduct Updated product data.
+     * @return true if update was successful.
+     */
     public boolean updateProduct(int id, Product updatedProduct) {
         if (updatedProduct == null) {
             throw new IllegalArgumentException("Updated product cannot be null.");
@@ -108,7 +136,12 @@ public class ProductManager {
         return false;
     }
 
-    // Delete a product
+    /**
+     * Deletes a product by ID.
+     *
+     * @param id ID of the product to delete.
+     * @return true if deleted.
+     */
     public boolean deleteProduct(int id) {
         boolean exists = products.stream().anyMatch(p -> p.getId() == id);
         if (!exists) return false;
@@ -118,7 +151,12 @@ public class ProductManager {
         return removed;
     }
 
-    // Search products
+    /**
+     * Searches for products by query.
+     *
+     * @param query Search term.
+     * @return Matching product list.
+     */
     public List<Product> searchProducts(String query) {
         String lowerQuery = query.toLowerCase();
         List<Product> searchResults = new ArrayList<>();
@@ -132,7 +170,11 @@ public class ProductManager {
         return searchResults;
     }
 
-    // Filter products
+    /**
+     * Filters products based on category, price range, and rating.
+     *
+     * @return Filtered product list.
+     */
     public List<Product> filterProducts(List<Product> products, String category, double minPrice, double maxPrice, double minRating) {
         List<Product> filteredProducts = new ArrayList<>(); // Create a new list to store filtered products
 
@@ -179,6 +221,13 @@ public class ProductManager {
         }
     }
 
+    /**
+     * Checks if a product exists by name and brand.
+     *
+     * @param name Product name.
+     * @param brand Product brand.
+     * @return true if product exists.
+     */
     public boolean productExists(String name, String brand) {
         for (Product p : products) {
             if (p.getName().equalsIgnoreCase(name) && p.getBrand().equalsIgnoreCase(brand)) {

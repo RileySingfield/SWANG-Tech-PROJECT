@@ -38,7 +38,7 @@ public class UserManager {
         try (FileWriter fw = new FileWriter(USER_FILE, true);
              BufferedWriter bw = new BufferedWriter(fw);
              PrintWriter out = new PrintWriter(bw)) {
-            out.println(user.getUsername() + "," + user.getPassword());
+            out.println(user.getUsername() + "," + user.getPassword()+"\n");
         } catch (IOException e) {
             e.printStackTrace();
         }

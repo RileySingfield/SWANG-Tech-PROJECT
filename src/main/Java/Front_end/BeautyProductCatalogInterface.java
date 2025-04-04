@@ -35,6 +35,7 @@ public class BeautyProductCatalogInterface {
     private final UserManager userManager = new UserManager();
     private final String[] categories = {"All", "lipstick", "liquid", "powder", "palette", "pencil", "cream", "mineral", "lip_stain"};
 
+    boolean wishlist = false;
     // Filter components as instance variables
     private JComboBox<String> priceDropdown;
     private JSlider sliderRating;
@@ -84,7 +85,7 @@ public class BeautyProductCatalogInterface {
      */
     private void loadProducts(List<Product> products,JPanel panel) {
         panel.removeAll(); // Clear panel efficiently
-
+        System.out.println("new screen");
         for (Product product : products) {
             JPanel productCard = new JPanel(new BorderLayout());
             productCard.setBackground(Color.WHITE);
@@ -116,7 +117,7 @@ public class BeautyProductCatalogInterface {
             });
 
             JButton detailsButton = new JButton(product.getName());
-            detailsButton.setPreferredSize(new Dimension(100, 30));
+            detailsButton.setSize(100, 30);
             detailsButton.setBackground(Color.WHITE);
             detailsButton.setOpaque(true);
             detailsButton.setBorderPainted(false);
@@ -128,7 +129,7 @@ public class BeautyProductCatalogInterface {
                     ex.printStackTrace();
                 }
             });
-            productCard.setMaximumSize(new Dimension(200, 200));
+            productCard.setSize(new Dimension(200, 200));
             productCard.add(imageLabel, BorderLayout.CENTER);
             productCard.add(detailsButton, BorderLayout.SOUTH);
             panel.add(productCard);
@@ -244,27 +245,35 @@ public class BeautyProductCatalogInterface {
         wishlistButton.setOpaque(true);
         wishlistButton.setBorderPainted(false);
 
+        JButton removeButton = new JButton("Remove from Wishlist");
+        removeButton.setBackground(Color.WHITE);
+        removeButton.setOpaque(true);
+        removeButton.setBorderPainted(false);
+
         if(userManager.getLoggedInUser()!=null){
             if(userManager.getLoggedInUser().getWishlist()!=null){
                 if(userManager.getLoggedInUser().getWishlist().contains(product)) {
-                    JButton removeButton = new JButton("Remove from Wishlist");
-                    removeButton.setBackground(Color.WHITE);
-                    removeButton.setOpaque(true);
-                    removeButton.setBorderPainted(false);
-                    removeButton.addActionListener(e -> {
-                        userManager.getLoggedInUser().removeFromWishlist(product);
-                    });
                     buttonPanel.add(removeButton);
                 }else {
                     buttonPanel.add(wishlistButton);
-
                 }
             }else {
                 buttonPanel.add(wishlistButton);
             }
         }
+        removeButton.addActionListener(e -> {
+            userManager.getLoggedInUser().removeFromWishlist(product);
+            buttonPanel.remove(removeButton);
+            buttonPanel.add(wishlistButton);
+            frame.revalidate();
+            frame.repaint();
+        });
         wishlistButton.addActionListener(e -> {
             userManager.getLoggedInUser().addToWishlist(product);
+            buttonPanel.remove(wishlistButton);
+            buttonPanel.add(removeButton);
+            frame.revalidate();
+            frame.repaint();
         });
 
 
@@ -711,11 +720,11 @@ public class BeautyProductCatalogInterface {
         wishlist.setBorderPainted(false);
         if(userManager.getLoggedInUser()!=null){
             //todo display button
-            topPanel.add(wishlist);
+            if(userManager.getLoggedInUser().getWishlist()!=null){
+                topPanel.add(wishlist);
+            }
         }
-
         //show username and status
-        //TODO add a dropdown menu to sign out or change accounts
         if(userManager.getLoggedInUser()!=null){
             String user = userManager.getLoggedInUser().getUsername();
             JLabel usernameLabel = new JLabel(user);
@@ -927,6 +936,7 @@ public class BeautyProductCatalogInterface {
      * shows products that have been added to a users wishlist in a seperate panel to the catalog screen.
      */
     public void wishListScreen() {
+        wishlist = true;
         JPanel wishListPanel = new JPanel();
         wishListPanel.setLayout(new BorderLayout(5,5));
         wishListPanel.setBackground(Color.WHITE);
@@ -939,15 +949,29 @@ public class BeautyProductCatalogInterface {
         topPanel.add(wishListLabel,BorderLayout.CENTER);
         topPanel.add(backButton,BorderLayout.WEST);
         wishListPanel.add(topPanel,BorderLayout.PAGE_START);
+        JPanel showItemsPanel = new JPanel();
+        showItemsPanel.setBackground(Color.WHITE);
+        loadProducts(userManager.getLoggedInUser().getWishlist(),showItemsPanel);
+        JScrollPane wishListScrollPane = new JScrollPane(showItemsPanel);
+        wishListScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        wishListScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        wishListScrollPane.setBorder(javax.swing.BorderFactory.createEmptyBorder());
+        wishListScrollPane.setPreferredSize(new Dimension(150, 400));
+        wishListPanel.add(wishListScrollPane,BorderLayout.CENTER);
+        wishListPanel.setVisible(true);
+        JPanel splitPanel = new JPanel();
+        splitPanel.setBackground(Color.WHITE);
+        splitPanel.add(wishListPanel);
+        splitPanel.add(detailPanel);
+        frame.add(splitPanel, BorderLayout.CENTER);
+        frame.setVisible(true);
         backButton.addActionListener(e -> {
-            frame.remove(wishListPanel);
+            frame.remove(splitPanel);
+            wishlist = false;
             catalogScreen();
         });
-        loadProducts(userManager.getLoggedInUser().getWishlist(),wishListPanel);
-        JScrollPane wishListScrollPane = new JScrollPane(wishListPanel);
-        wishListPanel.setVisible(true);
-        frame.add(wishListScrollPane, BorderLayout.CENTER);
-        frame.setVisible(true);
+        frame.revalidate();
+        frame.repaint();
     }
 
     /**

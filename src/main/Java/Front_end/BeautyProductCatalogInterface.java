@@ -942,13 +942,13 @@ public class BeautyProductCatalogInterface {
         wishListPanel.setBackground(Color.WHITE);
         String name = userManager.getLoggedInUser().getUsername();
         JLabel wishListLabel = new JLabel(name+"'s Wishlist:");
-        wishListLabel.setFont(new Font("Tahoma", Font.PLAIN, 112));
+        wishListLabel.setFont(new Font("Tahoma", Font.PLAIN, 70));
         JButton backButton = new JButton("Back");
-        JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.setBackground(Color.WHITE);
-        topPanel.add(wishListLabel,BorderLayout.CENTER);
-        topPanel.add(backButton,BorderLayout.WEST);
-        wishListPanel.add(topPanel,BorderLayout.PAGE_START);
+        backButton.setMaximumSize(new Dimension(100, 50));
+        wishListPanel.add(backButton, BorderLayout.PAGE_START);
+        wishListPanel.add(wishListLabel, BorderLayout.PAGE_END);
+
+        //load items and store in a scroll pane
         JPanel showItemsPanel = new JPanel();
         showItemsPanel.setBackground(Color.WHITE);
         loadProducts(userManager.getLoggedInUser().getWishlist(),showItemsPanel);
@@ -959,6 +959,8 @@ public class BeautyProductCatalogInterface {
         wishListScrollPane.setPreferredSize(new Dimension(150, 400));
         wishListPanel.add(wishListScrollPane,BorderLayout.CENTER);
         wishListPanel.setVisible(true);
+
+        //split panel to combine
         JPanel splitPanel = new JPanel();
         splitPanel.setBackground(Color.WHITE);
         splitPanel.add(wishListPanel);

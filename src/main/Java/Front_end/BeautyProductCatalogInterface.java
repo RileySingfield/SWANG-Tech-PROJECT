@@ -895,7 +895,6 @@ public class BeautyProductCatalogInterface {
             if(userManager.getLoggedInUser().getWishlist()!=null) {
                 frame.remove(topPanel);
                 frame.remove(mainSplitPane);
-                frame.remove(detailPanel);
                 wishListScreen();
             }
         });
@@ -950,15 +949,15 @@ public class BeautyProductCatalogInterface {
         wishListScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         wishListScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         wishListScrollPane.setBorder(javax.swing.BorderFactory.createEmptyBorder());
-        wishListScrollPane.setPreferredSize(new Dimension(150, 400));
+        wishListScrollPane.setPreferredSize(new Dimension(1000, 600));
         wishListPanel.add(wishListScrollPane,BorderLayout.CENTER);
         wishListPanel.setVisible(true);
 
         //split panel to combine
         JPanel splitPanel = new JPanel();
         splitPanel.setBackground(Color.WHITE);
-        splitPanel.add(wishListPanel);
-        splitPanel.add(detailPanel);
+        splitPanel.add(wishListPanel,BorderLayout.CENTER);
+        splitPanel.add(detailPanel,BorderLayout.EAST);
         frame.add(splitPanel, BorderLayout.CENTER);
         frame.setVisible(true);
         backButton.addActionListener(e -> {

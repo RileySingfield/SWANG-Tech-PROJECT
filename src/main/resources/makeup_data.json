@@ -175,7 +175,7 @@
   "price" : "7.99",
   "description" : "This silky blush with benefits can be used so many ways. It shapes, it contours, it highlights. Sunbaked on Italian terracotta tiles, it’s buildable from sheer to vibrant. Yes, it adds a cheeky pop of colour to your complexion. Radiance and warmth, too.Features:Multi-purpose: shapes, contours and highlights cheeksEasy to use for a perfect radiant finishMirror & brush applicator includedStreak-freeBuildable from sheer to vibrantApplication: Glide brush through color and lightly tap off excess powder. Lightly apply to cheeks, forehead, chin and/or nose and blend well for a soft glow.Ingredients: Talc, Mica, Glyceryl Ethylhexanoate/Stearate/Adipate, Dimethicone, Octyldodecyl Stearoyl Stearate, Isopropyl Myristate, Polyacrylamide, C13-14 Isoparaffin, Laureth-7, Sorbitan Stearate, Zea Mays (Corn) Starch, Lauroyl Lysine, Magnesium Aluminum Silicate, Cetearyl Ethylhexanoate, Sodium Dehydroacetate, Nylon-12, Imidazolidinyl Urea, Methylparaben, Silica, Ethylparaben, Propylparaben, Butylparaben, Titanium Dioxide (CI 77891), Iron Oxide (CI 77491). +/- May Contain: Iron Oxide (CI 77492, CI 77499), Yellow 5 (CI 19140), Red 7 (CI 15850), Yellow 6 (CI 15985), Carmine (CI 75470), Ultramarines (CI 77007). Shade Range:",
   "category" : "powder",
-  "rating" : 4.7,
+  "rating" : 4.9,
   "image_link" : "https://d3t32hsnjxo7q6.cloudfront.net/i/4ae353dcae46e9b97c4915566fc9190a_ra,w158,h184_pa,w158,h184.png",
   "product_type" : "blush"
 }, {
@@ -1459,16 +1459,6 @@
   "image_link" : "https://d3t32hsnjxo7q6.cloudfront.net/i/316d25ac5676470d83612b9391678b0d_ra,w158,h184_pa,w158,h184.jpeg",
   "product_type" : "eyeliner"
 }, {
-  "id" : 171,
-  "brand" : "e.l.f.",
-  "name" : "e.l.f. Studio Cream Eyeliner",
-  "price" : "4.99",
-  "description" : "e.l.f. Studio Cream Eyeliner's creamy formula creates smooth lines that are defined and precise.   Smudge-proof, budge-proof and water-resistant coverage for all day wear  to combat against sweat, tears or rain!  Achieve thin or bold lines with  ease.  Eyeliner Brush included.Ingredients:                    Isododecane, Hydrogenated  Polyisobutene, Polybutene, Polyethylene, Barium Sulfate, Cyclomethicone,  Disteardimonium Hectorite, Polyglyceryl-4 Isostearate, Propylene  Carbonate, Iron Oxides (CI 77491, CI 77492, CI 77499), Titanium Dioxide  (CI77891), Red No.40 Lake (CI 16035), Mica (CI 77019), Blue No.1 Lake  (CI 42090), Ferric Ferrocyanide (CI 77510), Ultramarine Violet (CI77077)",
-  "category" : "liquid",
-  "rating" : 4.5,
-  "image_link" : "https://d3t32hsnjxo7q6.cloudfront.net/i/571e52ec2ce167c2cd5ee2047015a1ed_ra,w158,h184_pa,w158,h184.jpeg",
-  "product_type" : "eyeliner"
-}, {
   "id" : 170,
   "brand" : "maybelline",
   "name" : "Maybelline Eye Studio Lasting Drama Gel Eyeliner",
@@ -1488,16 +1478,6 @@
   "rating" : 4.3,
   "image_link" : "https://d3t32hsnjxo7q6.cloudfront.net/i/f56b44752218960e8ff15d1364510544_ra,w158,h184_pa,w158,h184.jpeg",
   "product_type" : "eyeliner"
-}, {
-  "id" : 102,
-  "brand" : "covergirl",
-  "name" : "CoverGirl Outlast Lipcolor",
-  "price" : "12.99",
-  "description" : "CoverGirls very popular longwear lip color just got better! The advanced formula with resilient, brilliant color and new applicator gives you up to 24 hours of color in just 2 easy, breezy steps.Features:Lasts up to 24 hoursBeautiful shades that are food proof and transfer resistant all day!Moisturizing topcoat keeps lips feeling moist, soft and smoothApplication Tips: Apply color to clean lips. Let dry 60 seconds. Apply moisturizing topcoat. Reapply topcoat like a balm throughout the day to refresh your look and feel.",
-  "category" : "lipstick",
-  "rating" : 5.0,
-  "image_link" : "https://d3t32hsnjxo7q6.cloudfront.net/i/be04329866e96a0077545d230489d7a9_ra,w158,h184_pa,w158,h184.jpeg",
-  "product_type" : "lipstick"
 }, {
   "id" : 96,
   "brand" : "revlon",
@@ -1848,4 +1828,14 @@
   "rating" : 4.3,
   "image_link" : "https://d3t32hsnjxo7q6.cloudfront.net/i/b66c56aeb8d078123cca4c9c64d17cb9_ra,w158,h184_pa,w158,h184.jpeg",
   "product_type" : "lipstick"
+}, {
+  "id" : 461,
+  "brand" : "Testing (now testing editing",
+  "name" : "Rileys Makeup",
+  "price" : "500",
+  "description" : "this is not real",
+  "category" : "liquid",
+  "rating" : 3.0,
+  "image_link" : "file:/C:/Users/singf/Desktop/New%20Folder/",
+  "product_type" : "gloss"
 } ]

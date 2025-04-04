@@ -15,12 +15,15 @@ To build the project, navigate to the root directory and run:
 ### On Unix/Linux (MacOS, Ubuntu, etc.)
 ```sh
 chmod +x build.sh  # Only needed the first time
-./build.sh
+./build.sh # to build
+./run.sh # to run
+
 ```
 
 ### On Windows (Command Prompt)
 ```cmd
 build.bat
+run.bat
 ```
 
 This will clean, compile, package, and run the Java application.

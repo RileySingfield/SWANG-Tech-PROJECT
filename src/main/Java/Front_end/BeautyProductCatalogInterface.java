@@ -6,7 +6,6 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
@@ -15,6 +14,7 @@ import java.net.MalformedURLException;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.awt.image.BufferedImage;
@@ -80,8 +80,8 @@ public class BeautyProductCatalogInterface {
      * panel. It loads the label first and then the image, calling
      * fetchProductImage with a URL.
      *
-     * @param products
-     * @param panel
+     * @param products list of products to be loaded
+     * @param panel panel on which the products will be visible
      */
     private void loadProducts(List<Product> products,JPanel panel) {
         panel.removeAll(); // Clear panel efficiently
@@ -116,19 +116,7 @@ public class BeautyProductCatalogInterface {
                 }
             });
 
-            JButton detailsButton = new JButton(product.getName());
-            detailsButton.setSize(100, 30);
-            detailsButton.setBackground(Color.WHITE);
-            detailsButton.setOpaque(true);
-            detailsButton.setBorderPainted(false);
-            detailsButton.addActionListener(e -> {
-                selectedProduct = product;
-                try {
-                    showProductDetails(product);
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
-            });
+            JButton detailsButton = getJButton(product);
             productCard.setSize(new Dimension(200, 200));
             productCard.add(imageLabel, BorderLayout.CENTER);
             productCard.add(detailsButton, BorderLayout.SOUTH);
@@ -139,13 +127,30 @@ public class BeautyProductCatalogInterface {
         panel.repaint();
     }
 
+    private JButton getJButton(Product product) {
+        JButton detailsButton = new JButton(product.getName());
+        detailsButton.setSize(100, 30);
+        detailsButton.setBackground(Color.WHITE);
+        detailsButton.setOpaque(true);
+        detailsButton.setBorderPainted(false);
+        detailsButton.addActionListener(e -> {
+            selectedProduct = product;
+            try {
+                showProductDetails(product);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        });
+        return detailsButton;
+    }
+
     /**
      * When passed a url (read from csv file), this method converts the
      * URL into an ImageIcon, which is then returned to loadProducts.
      *
-     * @param imageUrl
-     * @return
-     * @throws IOException
+     * @param imageUrl webP url found in CSV file
+     * @return imageIcon for display, picture of product 
+     * @throws IOException if image form is wrong
      */
     public ImageIcon fetchProductImage(String imageUrl) throws IOException {
         if (imageCache.containsKey(imageUrl)) {
@@ -172,8 +177,8 @@ public class BeautyProductCatalogInterface {
      * fact, a proper, working URL. It returns a boolean value true
      * if it is a URL, and false if it isn't.
      *
-     * @param url
-     * @return
+     * @param url the WEBP url that needs to be confirmed
+     * @return boolean, true is yes, false if no.
      */
     private boolean isURL(String url) {
         try {
@@ -188,8 +193,8 @@ public class BeautyProductCatalogInterface {
      * This product adds a panel to the split screen that shows details
      * about the selected product. this is then displayed on the frame.
      *
-     * @param product
-     * @throws IOException
+     * @param product item that is selected to be detailed
+     * @throws IOException if product does not exist
      */
     private void showProductDetails(Product product) throws IOException {
         detailPanel.removeAll();
@@ -220,7 +225,7 @@ public class BeautyProductCatalogInterface {
         closeButton.setOpaque(true);
         closeButton.setBorderPainted(false);
         closeButton.addActionListener(e -> closeDetailPanel());
-
+        
         JButton deleteButton = new JButton("Delete");
         deleteButton.setBackground(Color.WHITE);
         deleteButton.setOpaque(true);
@@ -326,13 +331,13 @@ public class BeautyProductCatalogInterface {
     /**
      * When a user chooses to edit a product in the details panel,
      * this screen will pop up and allow for the user to change details about the product.
-     * @param product
+     * @param product product being edited
      */
     private void showEditProductDialog(Product product) {
         JTextField nameField = new JTextField(product.getName(), 20);
         JTextField priceField = new JTextField(product.getPrice(), 20);
         JTextField descriptionField = new JTextField(product.getDescription(), 20);
-        JComboBox categoryBox = new JComboBox<>(categories);
+        JComboBox<String> categoryBox = new JComboBox<>(categories);
         JTextField ratingField = new JTextField(String.valueOf(product.getRating()), 20);
         JTextField brandField = new JTextField(product.getBrand(), 20);
 
@@ -429,9 +434,9 @@ public class BeautyProductCatalogInterface {
     /**
      * helper method to create and pair label and text field.
      *
-     * @param labelText
-     * @param textField
-     * @return
+     * @param labelText label of the product
+     * @param textField field to be entered
+     * @return combined label and textfield of product
      */
     private JPanel createLabelAndField(String labelText, JTextField textField) {
         JPanel rowPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -458,10 +463,10 @@ public class BeautyProductCatalogInterface {
         List<Product> results;
 
         // Get current filter values
-        double minPrice = getMinPriceFromDropdown(priceDropdown.getSelectedItem().toString());
+        double minPrice = getMinPriceFromDropdown(Objects.requireNonNull(priceDropdown.getSelectedItem()).toString());
         double maxPrice = getMaxPriceFromDropdown(priceDropdown.getSelectedItem().toString());
         int minRating = sliderRating.getValue();
-        String selectedCategory = categoryDropdown.getSelectedItem().toString();
+        String selectedCategory = Objects.requireNonNull(categoryDropdown.getSelectedItem()).toString();
 
         if (query.isEmpty()) {
             // If no search query, apply only filters
@@ -477,49 +482,37 @@ public class BeautyProductCatalogInterface {
 
     /**
      * gets minimum price from values in choice box and returns it
-     * @param priceRange
-     * @return
+     * @param priceRange string selected in dropdown menu
+     * @return double value of minimum
      */
     private double getMinPriceFromDropdown(String priceRange) {
-        switch (priceRange) {
-            case "$0-10":
-                return 0.0;
-            case "$10-20":
-                return 10.0;
-            case "$20-30":
-                return 20.0;
-            case "$30-40":
-                return 30.0;
-            case "$40+":
-                return 40.0;
-            default:
-                return 0.0; // "All"
-        }
+        return switch (priceRange) {
+            case "$0-10" -> 0.0;
+            case "$10-20" -> 10.0;
+            case "$20-30" -> 20.0;
+            case "$30-40" -> 30.0;
+            case "$40+" -> 40.0;
+            default -> 0.0; // "All"
+        };
     }
 
     /**
      * gets maximum price from values in choice box and returns it
-     * @param priceRange
-     * @return double
+     * @param priceRange string selected in dropdown
+     * @return double value of maximum
      */
     private double getMaxPriceFromDropdown(String priceRange) {
-        switch (priceRange) {
-            case "$0-10":
-                return 10.0;
-            case "$10-20":
-                return 20.0;
-            case "$20-30":
-                return 30.0;
-            case "$30-40":
-                return 40.0;
-            case "$40+":
-                return 100.0; // Arbitrary large value
-            default:
-                return 100.0; // "All"
-        }
+        return switch (priceRange) {
+            case "$0-10" -> 10.0;
+            case "$10-20" -> 20.0;
+            case "$20-30" -> 30.0;
+            case "$30-40" -> 40.0;
+            case "$40+" -> 100.0; // Arbitrary large value
+            default -> 100.0; // "All"
+        };
     }
 
-    private FileFilter webpFilter = new FileFilter() {
+    final private FileFilter webpFilter = new FileFilter() {
         @Override
         public boolean accept(File file) {
             return file.isFile() && file.getName().toLowerCase().endsWith(".webp");
@@ -565,7 +558,7 @@ public class BeautyProductCatalogInterface {
         if (result == JOptionPane.OK_OPTION) {
             try {
                 // Validate required fields
-                if (nameField.getText().trim().isEmpty() ||brandField.getText().trim().isEmpty()|| priceField.getText().trim().isEmpty() || (String) categoryField.getSelectedItem()== null || descriptionField.getText().trim().isEmpty() || typeField.getText().trim().isEmpty() || ratingField.getText().trim().isEmpty()) {
+                if (nameField.getText().trim().isEmpty() ||brandField.getText().trim().isEmpty()|| priceField.getText().trim().isEmpty() || categoryField.getSelectedItem() == null || descriptionField.getText().trim().isEmpty() || typeField.getText().trim().isEmpty() || ratingField.getText().trim().isEmpty()) {
                     JOptionPane.showMessageDialog(frame, "Name, Price, Brand, and Category are required fields.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
@@ -840,10 +833,10 @@ public class BeautyProductCatalogInterface {
 
         // Apply Filters Button
         applyCategoryFilter.addActionListener(e -> {
-            double minPrice = getMinPriceFromDropdown(priceDropdown.getSelectedItem().toString());
+            double minPrice = getMinPriceFromDropdown(Objects.requireNonNull(priceDropdown.getSelectedItem()).toString());
             double maxPrice = getMaxPriceFromDropdown(priceDropdown.getSelectedItem().toString());
             int minRating = sliderRating.getValue();
-            String selectedCategory = categoryDropdown.getSelectedItem().toString();
+            String selectedCategory = Objects.requireNonNull(categoryDropdown.getSelectedItem()).toString();
 
             // Get search query
             String query = searchField.getText().trim();
@@ -902,6 +895,7 @@ public class BeautyProductCatalogInterface {
             if(userManager.getLoggedInUser().getWishlist()!=null) {
                 frame.remove(topPanel);
                 frame.remove(mainSplitPane);
+                frame.remove(detailPanel);
                 wishListScreen();
             }
         });
@@ -912,10 +906,10 @@ public class BeautyProductCatalogInterface {
             removeSearchButton.setVisible(false); // Hide the button
 
             // Reload products with active filters (if any)
-            double minPrice = getMinPriceFromDropdown(priceDropdown.getSelectedItem().toString());
+            double minPrice = getMinPriceFromDropdown(Objects.requireNonNull(priceDropdown.getSelectedItem()).toString());
             double maxPrice = getMaxPriceFromDropdown(priceDropdown.getSelectedItem().toString());
             int minRating = sliderRating.getValue();
-            String selectedCategory = categoryDropdown.getSelectedItem().toString();
+            String selectedCategory = Objects.requireNonNull(categoryDropdown.getSelectedItem()).toString();
 
             loadProducts(productManager.filterProducts(productManager.getAllProducts(), selectedCategory, minPrice, maxPrice, minRating),catalogPanel);
         });
@@ -1055,7 +1049,7 @@ public class BeautyProductCatalogInterface {
             char[] passwordChar = passwordField.getPassword();
             String password = new String(passwordChar);
             System.out.println(password);
-            if (username.equals("") || password.equals("")) {
+            if (username.isEmpty() || password.isEmpty()) {
                 warningEmpty.setVisible(true);
                 warningWrong.setVisible(false);
             }else{
@@ -1197,7 +1191,7 @@ public class BeautyProductCatalogInterface {
 
     /**
      * invoke GUI!
-     * @param args
+     * @param args regular
      */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(BeautyProductCatalogInterface::new);

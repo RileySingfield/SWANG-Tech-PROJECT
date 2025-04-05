@@ -72,7 +72,6 @@ public class BeautyProductCatalogInterface {
         frame.getContentPane().setBackground(new Color(245, 245, 245));
 
         loginScreen();
-        //catalogScreen();
     }
 
     /**
@@ -241,8 +240,12 @@ public class BeautyProductCatalogInterface {
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel.setOpaque(false);
-        buttonPanel.add(editButton);
-        buttonPanel.add(deleteButton);
+        if(userManager.getLoggedInUser()!=null) {
+            if(userManager.getLoggedInUser().equals("guest")){
+                buttonPanel.add(editButton);
+                buttonPanel.add(deleteButton);
+            }
+        }
         buttonPanel.add(closeButton);
 
         JButton wishlistButton = new JButton("Add to Wishlist");
@@ -356,11 +359,9 @@ public class BeautyProductCatalogInterface {
         panel.add(categoryPanel);
         panel.add(createLabelAndField("Rating:", ratingField));
         panel.add(createLabelAndField("Brand:", brandField));
-        //TODO add edit image option
 
         while (true) {
             int result = JOptionPane.showConfirmDialog(frame, panel, "Edit Product", JOptionPane.OK_CANCEL_OPTION);
-
             if (result != JOptionPane.OK_OPTION) {
                 return; // Cancelled, exit the method
             }
@@ -712,25 +713,25 @@ public class BeautyProductCatalogInterface {
         wishlist.setOpaque(true);
         wishlist.setBorderPainted(false);
         if(userManager.getLoggedInUser()!=null){
-            //todo display button
             if(userManager.getLoggedInUser().getWishlist()!=null){
                 topPanel.add(wishlist);
             }
         }
+
+        JButton logoutButton = new JButton("Logout");
+        topPanel.add(logoutButton);
+        topPanel.add(searchPanel);
+        topPanel.add(searchButton);
+
         //show username and status
         if(userManager.getLoggedInUser()!=null){
             String user = userManager.getLoggedInUser().getUsername();
             JLabel usernameLabel = new JLabel(user);
             if(!user.equals("guest")){
+                topPanel.add(addButton);
                 topPanel.add(usernameLabel);
             }
         }
-        JButton logoutButton = new JButton("Logout");
-        topPanel.add(logoutButton);
-
-        topPanel.add(searchPanel);
-        topPanel.add(searchButton);
-        topPanel.add(addButton);
 
 
         // FILTER PANEL
@@ -973,7 +974,6 @@ public class BeautyProductCatalogInterface {
      * shows login fields and allows a user to log in
      */
     public void loginScreen(){
-        //TODO add option to use as guest
         JPanel loginPanel = new JPanel();
         loginPanel.requestFocus();
         loginPanel.setLayout(new GridBagLayout());

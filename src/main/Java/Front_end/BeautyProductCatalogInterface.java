@@ -114,12 +114,13 @@ public class BeautyProductCatalogInterface {
                     e.printStackTrace();
                 }
             });
-
-            JButton detailsButton = getJButton(product);
-            productCard.setSize(new Dimension(200, 200));
-            productCard.add(imageLabel, BorderLayout.CENTER);
-            productCard.add(detailsButton, BorderLayout.SOUTH);
-            panel.add(productCard);
+            if(product!=null) {
+                JButton detailsButton = getJButton(product);
+                productCard.setSize(new Dimension(200, 200));
+                productCard.add(imageLabel, BorderLayout.CENTER);
+                productCard.add(detailsButton, BorderLayout.SOUTH);
+                panel.add(productCard);
+            }
         }
 
         panel.revalidate();
@@ -241,7 +242,7 @@ public class BeautyProductCatalogInterface {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel.setOpaque(false);
         if(userManager.getLoggedInUser()!=null) {
-            if(userManager.getLoggedInUser().equals("guest")){
+            if(!userManager.getLoggedInUser().equals("guest")){
                 buttonPanel.add(editButton);
                 buttonPanel.add(deleteButton);
             }

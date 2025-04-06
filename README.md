@@ -15,6 +15,7 @@ A Java SWING desktop application that allows users to manage beauty products. In
 - View specifc product descriptions
 - Scrollable view of all catalog products
 - Unit & integration tests with JUnit 5
+- 📄 [User Guide](https://docs.google.com/document/d/1rAz3nZ8IyznTzIgEenUde7T2FgYvx7yiR-c_I1MMFsg/edit?usp=sharing)
 
 # Build & Run Instructions
 

@@ -45,7 +45,7 @@ public class UserManager {
      *
      * @param user The user to append.
      */
-    private void appendUserToCSV(ProductUser user) {
+    public void appendUserToCSV(ProductUser user) {
         try (FileWriter fw = new FileWriter(USER_FILE, true);
              BufferedWriter bw = new BufferedWriter(fw);
              PrintWriter out = new PrintWriter(bw)) {

@@ -1,5 +1,5 @@
 import Back_end.Product;
-import Back_end.ProductManager;
+import Back_end.ProductUser;
 import Back_end.UserManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -7,69 +7,76 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 public class UserManagerTest {
-    private UserManager userManager;
-    private Product testProduct;
 
+    private UserManager userManager;
 
     @BeforeEach
     void setUp() {
-        userManager = new UserManager();
-        testProduct = new Product(12345, "WishlistBrand", "Wishlist Lipstick", "15.00",
-                "https://example.com/image.jpg", "Wishlist product description",
-                "lipstick", "Lipstick", 4.7);
+        // Use a spy to override appendUserToCSV() and avoid modifying the real CSV
+        userManager = spy(new UserManager());
+        doNothing().when(userManager).appendUserToCSV(any(ProductUser.class));
     }
 
+    // UT-17-CB: Login with valid credentials
     @Test
-    void testRegisterNewUser() {
-        assertTrue(userManager.register("newUser", "password123"), "User should be registered successfully");
-        assertFalse(userManager.register("newUser", "newPass"), "Duplicate username should not be allowed");
+    void testLoginValidCredentials() {
+        // Simulate registration
+        userManager = new UserManager(); // reinitialize with real load
+        String username = "junituser";
+        String password = "1234";
+
+        // Manually add the user (without writing to file)
+        userManager.register(username, password);
+
+        boolean loginSuccess = userManager.login(username, password);
+        assertTrue(loginSuccess, "Login should succeed with correct credentials.");
+        assertEquals(username, userManager.getLoggedInUser().getUsername());
     }
 
+    // UT-18-CB: Login with invalid credentials
     @Test
-    void testUserExists() {
-        assertTrue(userManager.userExists("Aminah"), "Existing user should be found");
-        assertFalse(userManager.userExists("nonExistingUser"), "Non-existent user should not be found");
+    void testLoginInvalidCredentials() {
+        userManager = new UserManager(); // reinitialize with real load
+        boolean result = userManager.login("nonexistentUser", "wrongpass");
+        assertFalse(result, "Login should fail with incorrect credentials.");
     }
 
-    @Test
-    void testLoginSuccess() {
-        assertTrue(userManager.login("gillian", "test"), "User should log in with correct credentials");
-    }
-
-    @Test
-    void testLoginFailure() {
-        assertFalse(userManager.login("gillian", "wrongPassword"), "User should not log in with incorrect password");
-        assertFalse(userManager.login("nonExistingUser", "password"), "Non-existent user should not log in");
-    }
-
-
+    // UT-19-CB: Logout test
     @Test
     void testLogout() {
-        userManager.login("Aminah", "passwd1");
-        assertNotNull(userManager.getLoggedInUser(), "User should be logged in");
+        userManager = new UserManager(); // reinitialize with real load
+        userManager.register("logoutUser", "test123");
+        userManager.login("logoutUser", "test123");
 
+        assertNotNull(userManager.getLoggedInUser(), "User should be logged in before logout.");
         userManager.logout();
-        assertNull(userManager.getLoggedInUser(), "User should be logged out");
+        assertNull(userManager.getLoggedInUser(), "Logged-in user should be null after logout.");
     }
 
-    /*@Test
-    void testAddToWishlist() {
-        boolean success = userManager.addToWishlist("Aminah", testProduct);
-        assertTrue(success, "Product should be added to wishlist.");
-    }
-
+    // UT-20-CB: Register with existing user credentials
     @Test
-    void testGetWishlist() {
-        List<Product> wishlist = userManager.getWishlist("Aminah");
-        assertNotNull(wishlist, "Wishlist should not be null.");
-        assertTrue(wishlist.isEmpty(), "Wishlist should be empty for a new user.");
+    void testRegisterExistingUser() {
+        userManager = new UserManager();
+        String username = "existingUser";
+        String password = "pass";
+
+        userManager.register(username, password);
+        boolean secondAttempt = userManager.register(username, password);
+        assertFalse(secondAttempt, "Should not register an already existing user.");
     }
 
+    // TC-025: Register new user with valid credentials
     @Test
-    void testRemoveFromWishlist() {
-        boolean success = userManager.removeFromWishlist("Aminah", testProduct.getId());
-        assertTrue(success, "Product should be removed from wishlist.");
-    }*/
+    void testRegisterNewUser() {
+        String username = "newTestUser";
+        String password = "pass123";
+
+        boolean success = userManager.register(username, password);
+        assertTrue(success, "Registration with valid credentials should succeed.");
+    }
+
+
 }

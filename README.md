@@ -1,6 +1,20 @@
-# SWANG-Tech_Full_Project
-SWANG Tech's repository for the whole term project
-
+# SWANG-Tech Beauty Catalog
+A Java SWING desktop application that allows users to manage beauty products. Includes functionality such as: 
+- Resister new users
+- Login/logout functionality
+- Add Products to the catalog (logged in users)
+- Edit catalog products (logged in users)
+- Delete catalog products (logged in users)
+- Add products to wishlist (logged in users)
+- Delete products from wishlist (logged in users)
+- View items in wishlist - with product details (logged in users)
+- Search Producucts based on keywords (clear search)
+- Apply filters (category, price, rating)
+- Clear filters
+- Filter & search together
+- View specifc product descriptions
+- Scrollable view of all catalog products
+- Unit & integration tests with JUnit 5
 
 # Build & Run Instructions
 
@@ -10,34 +24,54 @@ Before building and running the project, ensure you have:
 - **Maven** installed (`mvn -version` should confirm this)
 
 ## Building the Project
-To build the project, navigate to the root directory and run:
+There are various different ways to run our project 
 
-### On Unix/Linux (MacOS, Ubuntu, etc.)
-```sh
-chmod +x build.sh  # Only needed the first time
-./build.sh # to build
-./run.sh # to run
+### Option 1 - Run with maven 
+For development or testing:
 
+```bash
+mvn clean compile exec:java
 ```
 
-### On Windows (Command Prompt)
-```cmd
-build.bat
-run.bat
+### Option 2 -  Run the Fat JAR
+Build the project, first: 
+```sh
+mvn clean package
+```
+
+Then run with: 
+```sh
+java -jar target/BeautyCatalog-1.0-SNAPSHOT-jar-with-dependencies.jar
 ```
 
 This will clean, compile, package, and run the Java application.
 
-## Running the Application
-If the build is successful, you can run the application manually using:
-```sh
-java -jar target/beauty-product-catalog-1.0-SNAPSHOT.jar
+## Option 3 -  Windows Batch File (Double-Click)
+Double click build.bat and then run.bat
+
+## Option 4 - Mac/Linux Shell Script
+To make executable, run: 
+```bash
+chmod +x run.sh
+```
+Build the project: 
+```bash
+.\build.sh
+```
+Run the project: 
+```bash
+.\run.sh
 ```
 
 ## Running Tests
-To run unit tests:
-```sh
+All tests are written with JUnit 5 and Mockito
+Run all unit and integration tests:
+```bash
 mvn test
+```
+View test reports in:
+```
+target/surefire-reports/
 ```
 
 ## Troubleshooting
